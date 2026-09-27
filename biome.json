@@ -6,7 +6,13 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["**", "!dist", "!dist-ssr", "!coverage"],
+    "includes": [
+      "**",
+      "!dist",
+      "!dist-ssr",
+      "!coverage",
+      "!src/routeTree.gen.ts"
+    ],
     "ignoreUnknown": true
   },
   "formatter": {
