@@ -33,16 +33,22 @@ Open http://localhost:5173 in the browser.
 
 ## Checks
 
+Run formatting, linting, and import organization checks:
+
+```bash
+pnpm check
+```
+
+Apply safe fixes and formatting:
+
+```bash
+pnpm check:fix
+```
+
 Run TypeScript type checking:
 
 ```bash
 pnpm typecheck
-```
-
-Run ESLint:
-
-```bash
-pnpm lint
 ```
 
 Create a production build:
