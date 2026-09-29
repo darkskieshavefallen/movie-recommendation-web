@@ -14,6 +14,7 @@
     "check:fix": "biome check --write .",
     "openapi:check": "openapi-typescript openapi/movie-recommendation-api.json --output src/shared/api/generated/schema.d.ts --alphabetize --check",
     "openapi:generate": "openapi-typescript openapi/movie-recommendation-api.json --output src/shared/api/generated/schema.d.ts --alphabetize",
+    "test": "vitest run",
     "typecheck": "tsc -b --pretty false",
     "preview": "vite preview"
   },
@@ -43,6 +44,7 @@
     "openapi-typescript": "^7.13.0",
     "tailwindcss": "4.3.3",
     "typescript": "~6.0.3",
-    "vite": "^8.3.0"
+    "vite": "^8.3.0",
+    "vitest": "^5.0.2"
   }
 }
