@@ -31,6 +31,37 @@ pnpm dev
 
 Open http://localhost:5173 in the browser.
 
+## Run the full stack locally
+
+The frontend and backend are separate repositories. Keep them in sibling
+directories so each project retains its own runtime, dependencies, and Git
+history.
+
+Start the backend first:
+
+```bash
+git clone https://github.com/darkskieshavefallen/movie-recommendation-api.git
+cd movie-recommendation-api
+cp .env.example .env
+docker compose up --build
+```
+
+In another terminal, start this frontend:
+
+```bash
+git clone https://github.com/darkskieshavefallen/movie-recommendation-web.git
+cd movie-recommendation-web
+corepack enable
+pnpm install --frozen-lockfile
+cp .env.example .env.local
+pnpm dev
+```
+
+The default `VITE_API_BASE_URL=http://127.0.0.1:8000` sends browser requests to
+FastAPI. The backend CORS defaults allow the Vite origin at
+`http://localhost:5173`. Verify the backend at http://127.0.0.1:8000/health and
+then open the frontend at http://localhost:5173.
+
 ## Application structure
 
 The frontend uses feature-based layers:
@@ -42,6 +73,17 @@ The frontend uses feature-based layers:
 - `entities` contains domain models and entity-level UI.
 - `shared` contains reusable infrastructure and UI.
 - `mocks` contains test fixtures and API mocks.
+
+```mermaid
+flowchart LR
+    Browser[React SPA] -->|typed HTTP via VITE_API_BASE_URL| API[FastAPI backend]
+    API --> DB[(PostgreSQL)]
+    API -. optional read-only search .-> TMDB[TMDB]
+```
+
+The browser never connects to PostgreSQL or TMDB directly. FastAPI owns the
+runtime HTTP contract and all provider credentials; the frontend consumes only
+the committed OpenAPI snapshot described below.
 
 TanStack Router generates the type-safe route tree from files in `src/routes`.
 The generated `src/routeTree.gen.ts` file is committed but must not be edited manually.
@@ -104,6 +146,12 @@ Run TypeScript type checking:
 pnpm typecheck
 ```
 
+Run unit tests once:
+
+```bash
+pnpm test
+```
+
 Create a production build:
 
 ```bash
@@ -117,3 +165,11 @@ pnpm preview
 ```
 
 Open http://localhost:4173 in the browser.
+
+## Continuous integration
+
+GitHub Actions runs the frozen pnpm install, formatting/linting and OpenAPI
+drift check, TypeScript typecheck, unit tests, and production build for every
+pull request and every push to `main`. CI uses Node.js from `.nvmrc` (Node 24)
+and caches the pnpm package store using `pnpm-lock.yaml`; it does not cache
+`node_modules`, environment files, or secrets.
