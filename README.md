@@ -68,6 +68,22 @@ Add future shadcn components with:
 pnpm dlx shadcn@latest add <component>
 ```
 
+## API contract
+
+The frontend HTTP contract is generated from the committed FastAPI OpenAPI
+snapshot in `openapi/movie-recommendation-api.json`. Its backend source commit
+is recorded in `openapi/README.md`.
+
+Regenerate the types after updating the snapshot:
+
+```bash
+pnpm openapi:generate
+```
+
+All requests use the shared `openapi-fetch` client configured by
+`VITE_API_BASE_URL`. `openapi-react-query` exposes typed query and mutation
+hooks, and the application provides one shared TanStack Query client.
+
 ## Checks
 
 Run formatting, linting, and import organization checks:

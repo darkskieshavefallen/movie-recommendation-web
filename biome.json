@@ -11,7 +11,9 @@
       "!dist",
       "!dist-ssr",
       "!coverage",
-      "!src/routeTree.gen.ts"
+      "!src/routeTree.gen.ts",
+      "!openapi/movie-recommendation-api.json",
+      "!src/shared/api/generated/schema.d.ts"
     ],
     "ignoreUnknown": true
   },

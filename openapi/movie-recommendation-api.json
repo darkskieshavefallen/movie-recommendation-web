@@ -1,0 +1,759 @@
+{
+  "components": {
+    "schemas": {
+      "ExternalMovieErrorResponse": {
+        "additionalProperties": false,
+        "description": "Public error body for an external movie provider failure.",
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          }
+        },
+        "required": [
+          "detail"
+        ],
+        "title": "ExternalMovieErrorResponse",
+        "type": "object"
+      },
+      "ExternalMovieSearchResponse": {
+        "additionalProperties": false,
+        "description": "Stable response envelope for external movie search results.",
+        "properties": {
+          "query": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Query",
+            "type": "string"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/ExternalMovieSearchResult"
+            },
+            "title": "Results",
+            "type": "array"
+          }
+        },
+        "required": [
+          "query",
+          "results"
+        ],
+        "title": "ExternalMovieSearchResponse",
+        "type": "object"
+      },
+      "ExternalMovieSearchResult": {
+        "additionalProperties": false,
+        "description": "Application-owned representation of an external movie match.",
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "external_id": {
+            "minLength": 1,
+            "title": "External Id",
+            "type": "string"
+          },
+          "release_year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Release Year"
+          },
+          "title": {
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "external_id",
+          "title"
+        ],
+        "title": "ExternalMovieSearchResult",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "MovieCreate": {
+        "description": "Schema for creating a movie.",
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "genres": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "title": "Genres",
+            "type": "array"
+          },
+          "release_year": {
+            "maximum": 2100.0,
+            "minimum": 1888.0,
+            "title": "Release Year",
+            "type": "integer"
+          },
+          "title": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "release_year"
+        ],
+        "title": "MovieCreate",
+        "type": "object"
+      },
+      "MovieRead": {
+        "description": "Schema for reading movie data.",
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "genres": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "title": "Genres",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "release_year": {
+            "maximum": 2100.0,
+            "minimum": 1888.0,
+            "title": "Release Year",
+            "type": "integer"
+          },
+          "title": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "release_year",
+          "id"
+        ],
+        "title": "MovieRead",
+        "type": "object"
+      },
+      "MovieRecommendation": {
+        "description": "One ranked local movie with an explanation of its match.",
+        "properties": {
+          "matching_genres": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "minItems": 1,
+            "title": "Matching Genres",
+            "type": "array"
+          },
+          "movie_id": {
+            "title": "Movie Id",
+            "type": "integer"
+          },
+          "release_year": {
+            "title": "Release Year",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "movie_id",
+          "title",
+          "release_year",
+          "matching_genres"
+        ],
+        "title": "MovieRecommendation",
+        "type": "object"
+      },
+      "MovieRecommendations": {
+        "description": "Recommendations associated with one local source movie.",
+        "properties": {
+          "recommendations": {
+            "items": {
+              "$ref": "#/components/schemas/MovieRecommendation"
+            },
+            "title": "Recommendations",
+            "type": "array"
+          },
+          "source_movie_id": {
+            "title": "Source Movie Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "source_movie_id",
+          "recommendations"
+        ],
+        "title": "MovieRecommendations",
+        "type": "object"
+      },
+      "MovieUpdate": {
+        "description": "Schema for updating a movie.",
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "genres": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "title": "Genres",
+            "type": "array"
+          },
+          "release_year": {
+            "maximum": 2100.0,
+            "minimum": 1888.0,
+            "title": "Release Year",
+            "type": "integer"
+          },
+          "title": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "release_year"
+        ],
+        "title": "MovieUpdate",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Backend service for movie recommendations.",
+    "title": "Movie Recommendation API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/external/movies/search": {
+      "get": {
+        "description": "Search external movies without reading or writing local movie records.",
+        "operationId": "search_external_movies_external_movies_search_get",
+        "parameters": [
+          {
+            "description": "Movie title to search for in the external catalog.",
+            "in": "query",
+            "name": "query",
+            "required": true,
+            "schema": {
+              "description": "Movie title to search for in the external catalog.",
+              "maxLength": 200,
+              "minLength": 1,
+              "title": "Query",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalMovieSearchResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalMovieErrorResponse"
+                }
+              }
+            },
+            "description": "Provider authentication, request, or response failure."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalMovieErrorResponse"
+                }
+              }
+            },
+            "description": "Catalog disabled, unavailable, or rate limited."
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalMovieErrorResponse"
+                }
+              }
+            },
+            "description": "Provider request timed out."
+          }
+        },
+        "summary": "Search the external movie catalog",
+        "tags": [
+          "External movies"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "description": "Check if the application is running.",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Health Check Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Application health check",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/health/db": {
+      "get": {
+        "description": "Check database connectivity.",
+        "operationId": "database_health_check_health_db_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Database Health Check Health Db Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Database health check",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/movies/": {
+      "get": {
+        "description": "Return a paginated list of movies.",
+        "operationId": "list_movies_movies__get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MovieRead"
+                  },
+                  "title": "Response List Movies Movies  Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Movies",
+        "tags": [
+          "Movies"
+        ]
+      },
+      "post": {
+        "description": "Create a new movie.",
+        "operationId": "create_movie_movies__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MovieCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MovieRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Movie",
+        "tags": [
+          "Movies"
+        ]
+      }
+    },
+    "/movies/{movie_id}": {
+      "delete": {
+        "description": "Delete an existing movie.",
+        "operationId": "delete_movie_movies__movie_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "movie_id",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Movie Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Movie",
+        "tags": [
+          "Movies"
+        ]
+      },
+      "get": {
+        "description": "Return a movie by its ID.",
+        "operationId": "get_movie_movies__movie_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "movie_id",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Movie Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MovieRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Movie",
+        "tags": [
+          "Movies"
+        ]
+      },
+      "put": {
+        "description": "Update an existing movie.",
+        "operationId": "update_movie_movies__movie_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "movie_id",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Movie Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MovieUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MovieRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Movie",
+        "tags": [
+          "Movies"
+        ]
+      }
+    },
+    "/movies/{movie_id}/recommendations": {
+      "get": {
+        "description": "Return deterministic recommendations from the local catalog.",
+        "operationId": "recommend_movies_movies__movie_id__recommendations_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "movie_id",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Movie Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 5,
+              "maximum": 20,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MovieRecommendations"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "The source movie was not found."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Recommend similar local movies",
+        "tags": [
+          "Movies"
+        ]
+      }
+    }
+  }
+}
