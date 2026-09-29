@@ -54,6 +54,20 @@ The generated `src/routeTree.gen.ts` file is committed but must not be edited ma
 | `/movies/:movieId/edit` | Edit movie |
 | `/external-search?query=...` | External movie search |
 
+## Design system
+
+- Tailwind CSS 4.3 provides utility classes and CSS-first theme configuration.
+- shadcn/ui components use Base UI primitives and live in `src/shared/ui`.
+- Design tokens for colors, typography, spacing, and radius are defined in `src/index.css`.
+- The light/dark theme follows the system preference on first visit and persists the user's choice.
+- Lucide provides interface icons; decorative icons are hidden from assistive technology.
+
+Add future shadcn components with:
+
+```bash
+pnpm dlx shadcn@latest add <component>
+```
+
 ## Checks
 
 Run formatting, linting, and import organization checks:

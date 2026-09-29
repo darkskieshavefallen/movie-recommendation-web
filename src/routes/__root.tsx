@@ -1,4 +1,5 @@
-import { createRootRoute, Outlet } from '@tanstack/react-router'
+import { createRootRoute } from '@tanstack/react-router'
+import { AppShell } from '@/app/layout/AppShell'
 import { NotFoundPage } from '../pages/not-found/NotFoundPage'
 import { RootErrorPage } from '../pages/root-error/RootErrorPage'
 
@@ -9,5 +10,5 @@ export const Route = createRootRoute({
 })
 
 function RootRoute() {
-  return <Outlet />
+  return <AppShell />
 }
