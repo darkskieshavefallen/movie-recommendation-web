@@ -30,7 +30,7 @@ export function RouteLinks() {
             }}
           >
             <PlusIcon aria-hidden="true" />
-            <span className="hidden md:inline">Create</span>
+            <span className="sr-only md:not-sr-only">Create</span>
           </Link>
         </li>
         <li>
@@ -43,7 +43,7 @@ export function RouteLinks() {
             }}
           >
             <SearchIcon aria-hidden="true" />
-            <span className="hidden md:inline">Search</span>
+            <span className="sr-only md:not-sr-only">Search</span>
           </Link>
         </li>
       </ul>
