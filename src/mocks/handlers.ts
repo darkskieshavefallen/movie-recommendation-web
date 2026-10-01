@@ -21,6 +21,17 @@ export const movieHandlers = [
 
     return HttpResponse.json(movie)
   }),
+  http.delete(MOVIE_DETAILS_URL, ({ params }) => {
+    const movieExists = movieFixtures.some(
+      ({ id }) => id === Number(params.movieId),
+    )
+
+    if (!movieExists) {
+      return HttpResponse.json({ detail: 'Movie not found' }, { status: 404 })
+    }
+
+    return new HttpResponse(null, { status: 204 })
+  }),
 ]
 
 export const movieErrorHandlers = {

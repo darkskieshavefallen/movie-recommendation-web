@@ -28,6 +28,15 @@ describe('movieHandlers', () => {
     })
   })
 
+  it('deletes an existing movie', async () => {
+    const response = await fetch('http://127.0.0.1:8000/movies/1', {
+      method: 'DELETE',
+    })
+
+    expect(response.status).toBe(204)
+    await expect(response.text()).resolves.toBe('')
+  })
+
   it.each([
     ['rateLimited', 429],
     ['serviceUnavailable', 503],
