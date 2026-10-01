@@ -126,6 +126,20 @@ All requests use the shared `openapi-fetch` client configured by
 `VITE_API_BASE_URL`. `openapi-react-query` exposes typed query and mutation
 hooks, and the application provides one shared TanStack Query client.
 
+## Local catalog
+
+The completed second web sprint provides:
+
+- a responsive local movie grid backed by `GET /movies/`;
+- URL pagination through validated `offset` and `limit` search parameters;
+- direct movie detail routes backed by `GET /movies/{movie_id}`;
+- explicit skeleton, empty, offline, retry, not-found, and API error states;
+- safe query retries and reusable MSW fixtures for HTTP-boundary tests.
+
+Component tests render the real router and TanStack Query provider, then use
+React Testing Library and MSW to exercise the same links, buttons, and HTTP
+requests as a user. Internal hooks are not mocked.
+
 ## Checks
 
 Run formatting, linting, and import organization checks:

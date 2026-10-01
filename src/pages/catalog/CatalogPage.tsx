@@ -7,6 +7,9 @@ import { CatalogPagination } from '@/features/catalog-pagination/ui/CatalogPagin
 import { toApiErrorViewModel } from '@/shared/api/errors'
 import { buttonVariants } from '@/shared/ui/button'
 import type { CatalogSearch } from '../../shared/lib/router/searchParams'
+import { CatalogEmptyState } from './ui/CatalogEmptyState'
+import { CatalogErrorState } from './ui/CatalogErrorState'
+import { CatalogSkeleton } from './ui/CatalogSkeleton'
 
 export function CatalogPage({ offset, limit }: CatalogSearch) {
   const moviesQuery = useMoviesQuery({ offset, limit })
@@ -14,26 +17,19 @@ export function CatalogPage({ offset, limit }: CatalogSearch) {
   let content: ReactNode
 
   if (moviesQuery.isPending) {
-    content = (
-      <p className="text-muted-foreground" role="status">
-        Loading movie catalog…
-      </p>
-    )
+    content = <CatalogSkeleton />
   } else if (moviesQuery.isError) {
     const error = toApiErrorViewModel(moviesQuery.error)
 
     content = (
-      <div className="grid gap-1" role="alert">
-        <h2 className="font-heading text-lg font-semibold">{error.title}</h2>
-        <p className="text-muted-foreground">{error.message}</p>
-      </div>
+      <CatalogErrorState
+        error={error}
+        isRetrying={moviesQuery.isFetching}
+        onRetry={() => void moviesQuery.refetch()}
+      />
     )
   } else if (moviesQuery.data.length === 0) {
-    content = (
-      <p className="text-muted-foreground">
-        No movies have been added to the local catalog yet.
-      </p>
-    )
+    content = <CatalogEmptyState />
   } else {
     content = <MovieList movies={moviesQuery.data} />
   }
