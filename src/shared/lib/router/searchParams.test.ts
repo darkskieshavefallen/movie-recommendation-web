@@ -22,6 +22,16 @@ describe('parseCatalogSearch', () => {
       offset: 0,
       limit: 20,
     })
+    expect(
+      parseCatalogSearch({ offset: Number.MAX_SAFE_INTEGER + 1, limit: ' ' }),
+    ).toEqual({
+      offset: 0,
+      limit: 20,
+    })
+    expect(parseCatalogSearch({ offset: false, limit: ['10'] })).toEqual({
+      offset: 0,
+      limit: 20,
+    })
   })
 })
 

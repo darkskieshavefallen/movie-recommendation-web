@@ -3,6 +3,7 @@ import { PlusIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useMoviesQuery } from '@/entities/movie/api/useMoviesQuery'
 import { MovieList } from '@/entities/movie/ui/MovieList'
+import { CatalogPagination } from '@/features/catalog-pagination/ui/CatalogPagination'
 import { toApiErrorViewModel } from '@/shared/api/errors'
 import { buttonVariants } from '@/shared/ui/button'
 import type { CatalogSearch } from '../../shared/lib/router/searchParams'
@@ -60,6 +61,13 @@ export function CatalogPage({ offset, limit }: CatalogSearch) {
         </Link>
       </header>
       {content}
+      {moviesQuery.isSuccess ? (
+        <CatalogPagination
+          limit={limit}
+          offset={offset}
+          resultCount={moviesQuery.data.length}
+        />
+      ) : null}
     </section>
   )
 }
