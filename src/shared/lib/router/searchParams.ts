@@ -13,9 +13,16 @@ const MAX_LIMIT = 100
 const MAX_QUERY_LENGTH = 200
 
 function readInteger(value: unknown, fallback: number) {
+  if (
+    (typeof value !== 'number' && typeof value !== 'string') ||
+    (typeof value === 'string' && value.trim() === '')
+  ) {
+    return fallback
+  }
+
   const parsed = typeof value === 'number' ? value : Number(value)
 
-  return Number.isInteger(parsed) && parsed >= 0 ? parsed : fallback
+  return Number.isSafeInteger(parsed) && parsed >= 0 ? parsed : fallback
 }
 
 export function parseCatalogSearch(
