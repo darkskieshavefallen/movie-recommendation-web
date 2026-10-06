@@ -140,6 +140,54 @@ Component tests render the real router and TanStack Query provider, then use
 React Testing Library and MSW to exercise the same links, buttons, and HTTP
 requests as a user. Internal hooks are not mocked.
 
+## CRUD MVP
+
+The completed third web sprint adds the first full local catalog workflow:
+
+- one React Hook Form and Zod 4 form shared by create and edit screens;
+- client validation matching the public backend constraints, with FastAPI 422
+  issues mapped back to the relevant fields;
+- typed `POST /movies/`, full-replacement `PUT /movies/{movie_id}`, and
+  `DELETE /movies/{movie_id}` mutations;
+- detail and list cache synchronization without a full page reload;
+- protected mutation buttons, accessible delete confirmation, safe CRUD toasts,
+  and controlled `404`, `409`, network, and server error states.
+
+Component tests include an HTTP-boundary CRUD journey from catalog to create,
+detail, edit, catalog refresh, and deletion. Separate tests cover validation,
+duplicate submits, cancellation, cache updates, and failed mutations preserving
+the current UI state.
+
+### Manual local CRUD smoke
+
+With PostgreSQL and the backend running, start the frontend at
+http://localhost:5173 and complete this flow without Swagger or a separate HTTP
+client:
+
+1. Open the catalog and choose **Create movie**.
+2. Submit once with missing required fields and confirm inline validation.
+3. Create a uniquely named smoke-test movie and confirm its detail page opens.
+4. Edit every field, save, and confirm both detail and catalog show the changes.
+5. Open the delete dialog, cancel once, reopen it, then confirm deletion.
+6. Confirm the movie is absent from the catalog and a direct detail URL shows
+   the not-found state.
+
+Use `localhost` for the Vite origin. The backend CORS defaults allow
+`http://localhost:5173`; opening Vite as `http://127.0.0.1:5173` is a different
+origin and may be rejected.
+
+### Current API limitations
+
+- Catalog pagination uses `offset` and `limit`; the API does not return a total
+  count.
+- Movie updates are complete replacements via `PUT`, not partial `PATCH`
+  updates.
+- The local movie model has no poster or image fields.
+- External search is read-only and there is no TMDB-to-local import endpoint.
+- Authentication, authorization, and multi-user conflict resolution are not
+  part of the current contract.
+- Provider credentials remain backend-only and are never sent to the browser.
+
 ## Checks
 
 Run formatting, linting, and import organization checks:

@@ -5,6 +5,7 @@ describe('toApiErrorViewModel', () => {
   it.each([
     ['network', undefined, 'network', true],
     ['http', 404, 'not_found', false],
+    ['http', 409, 'conflict', false],
     ['validation', 422, 'validation', false],
     ['http', 429, 'rate_limited', false],
     ['http', 503, 'service_unavailable', true],
@@ -40,7 +41,7 @@ describe('toApiErrorViewModel', () => {
 
 describe('isRetryableApiError', () => {
   it('does not retry expected client errors', () => {
-    for (const status of [400, 404, 422, 429]) {
+    for (const status of [400, 404, 409, 422, 429]) {
       expect(
         isRetryableApiError(
           new ApiError({ kind: 'http', message: 'Client error', status }),

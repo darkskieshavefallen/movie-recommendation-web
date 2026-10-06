@@ -1,5 +1,5 @@
 import { HttpResponse, http } from 'msw'
-import { movieFixtures } from './fixtures/movies'
+import { type MovieFixture, movieFixtures } from './fixtures/movies'
 
 const MOVIES_URL = '*/movies/'
 const MOVIE_DETAILS_URL = '*/movies/:movieId'
@@ -20,6 +20,29 @@ export const movieHandlers = [
     }
 
     return HttpResponse.json(movie)
+  }),
+  http.post(MOVIES_URL, async ({ request }) => {
+    const movie = (await request.json()) as Omit<MovieFixture, 'id'>
+
+    return HttpResponse.json({ id: 3, ...movie } satisfies MovieFixture, {
+      status: 201,
+    })
+  }),
+  http.put(MOVIE_DETAILS_URL, async ({ params, request }) => {
+    const movieExists = movieFixtures.some(
+      ({ id }) => id === Number(params.movieId),
+    )
+
+    if (!movieExists) {
+      return HttpResponse.json({ detail: 'Movie not found' }, { status: 404 })
+    }
+
+    const movie = (await request.json()) as Omit<MovieFixture, 'id'>
+
+    return HttpResponse.json({
+      id: Number(params.movieId),
+      ...movie,
+    } satisfies MovieFixture)
   }),
   http.delete(MOVIE_DETAILS_URL, ({ params }) => {
     const movieExists = movieFixtures.some(

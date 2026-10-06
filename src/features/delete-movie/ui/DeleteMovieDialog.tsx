@@ -1,8 +1,11 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { Trash2Icon } from 'lucide-react'
+import { useRef, useState } from 'react'
+import {
+  getMovieCrudErrorToast,
+  getMovieCrudSuccessToast,
+} from '@/entities/movie/model/movieCrudFeedback'
 import { toApiErrorViewModel } from '@/shared/api/errors'
-import { queryKeys } from '@/shared/api/queryKeys'
 import { Button } from '@/shared/ui/button'
 import {
   Dialog,
@@ -28,39 +31,56 @@ export function DeleteMovieDialog({
 }: DeleteMovieDialogProps) {
   const deleteMovie = useDeleteMovieMutation()
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
+  const [open, setOpen] = useState(false)
+  const submissionRef = useRef<ReturnType<typeof deleteMovie.mutateAsync>>(null)
   const error = deleteMovie.isError
     ? toApiErrorViewModel(deleteMovie.error)
     : null
 
   async function handleDelete() {
+    if (submissionRef.current) {
+      return
+    }
+
+    const submission = deleteMovie.mutateAsync(movieId)
+    submissionRef.current = submission
+
     try {
-      await deleteMovie.mutateAsync(movieId)
+      await submission
       await navigate({
         to: '/movies',
         search: { offset: 0, limit: 20 },
         replace: true,
       })
-      queryClient.removeQueries({
-        queryKey: queryKeys.movies.detail(movieId),
-      })
-      toast.add({
-        title: 'Movie deleted',
-        description: `${movieTitle} was removed from the local catalog.`,
-        type: 'success',
-      })
-    } catch {
-      // The mutation exposes the safe inline error below.
+      toast.add(getMovieCrudSuccessToast('delete', movieTitle))
+    } catch (deleteError) {
+      toast.add(getMovieCrudErrorToast('delete', deleteError))
+    } finally {
+      if (submissionRef.current === submission) {
+        submissionRef.current = null
+      }
+    }
+  }
+
+  function handleOpenChange(nextOpen: boolean) {
+    if (!nextOpen && deleteMovie.isPending) {
+      return
+    }
+
+    setOpen(nextOpen)
+
+    if (!nextOpen) {
+      deleteMovie.reset()
     }
   }
 
   return (
-    <Dialog onOpenChange={(open) => !open && deleteMovie.reset()}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger render={<Button variant="destructive" />}>
         <Trash2Icon data-icon="inline-start" aria-hidden="true" />
         Delete
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent showCloseButton={!deleteMovie.isPending}>
         <DialogHeader>
           <DialogTitle>Delete {movieTitle}?</DialogTitle>
           <DialogDescription>
