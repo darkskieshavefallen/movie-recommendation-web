@@ -2,6 +2,10 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { RotateCcwIcon } from 'lucide-react'
 import { useRef } from 'react'
 import { useMovieQuery } from '@/entities/movie/api/useMovieQuery'
+import {
+  getMovieCrudErrorToast,
+  getMovieCrudSuccessToast,
+} from '@/entities/movie/model/movieCrudFeedback'
 import { parseMovieId } from '@/entities/movie/model/movieId'
 import { useUpdateMovieMutation } from '@/features/edit-movie/api/useUpdateMovieMutation'
 import type { MovieFormData } from '@/features/movie-form/model/movieFormSchema'
@@ -78,19 +82,9 @@ export function EditMoviePage({ movieId }: EditMoviePageProps) {
         params: { movieId: String(updatedMovie.id) },
         replace: true,
       })
-      toast.add({
-        title: 'Movie updated',
-        description: `${updatedMovie.title} now has your latest changes.`,
-        type: 'success',
-      })
+      toast.add(getMovieCrudSuccessToast('update', updatedMovie.title))
     } catch (error) {
-      const errorView = toApiErrorViewModel(error)
-
-      toast.add({
-        title: 'Changes not saved',
-        description: errorView.message,
-        type: 'error',
-      })
+      toast.add(getMovieCrudErrorToast('update', error))
     } finally {
       if (submissionRef.current === submission) {
         submissionRef.current = null

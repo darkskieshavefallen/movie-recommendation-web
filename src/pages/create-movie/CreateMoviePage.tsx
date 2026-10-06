@@ -1,9 +1,12 @@
 import { useNavigate } from '@tanstack/react-router'
 import { useRef } from 'react'
+import {
+  getMovieCrudErrorToast,
+  getMovieCrudSuccessToast,
+} from '@/entities/movie/model/movieCrudFeedback'
 import { useCreateMovieMutation } from '@/features/create-movie/api/useCreateMovieMutation'
 import type { MovieFormData } from '@/features/movie-form/model/movieFormSchema'
 import { MovieForm } from '@/features/movie-form/ui/MovieForm'
-import { toApiErrorViewModel } from '@/shared/api/errors'
 import { Card, CardContent } from '@/shared/ui/card'
 import { toast } from '@/shared/ui/toast'
 
@@ -28,19 +31,9 @@ export function CreateMoviePage() {
         params: { movieId: String(movie.id) },
         replace: true,
       })
-      toast.add({
-        title: 'Movie created',
-        description: `${movie.title} was added to the local catalog.`,
-        type: 'success',
-      })
+      toast.add(getMovieCrudSuccessToast('create', movie.title))
     } catch (error) {
-      const errorView = toApiErrorViewModel(error)
-
-      toast.add({
-        title: 'Movie not created',
-        description: errorView.message,
-        type: 'error',
-      })
+      toast.add(getMovieCrudErrorToast('create', error))
     } finally {
       if (submissionRef.current === submission) {
         submissionRef.current = null
