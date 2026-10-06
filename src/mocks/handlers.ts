@@ -1,5 +1,5 @@
 import { HttpResponse, http } from 'msw'
-import { movieFixtures } from './fixtures/movies'
+import { type MovieFixture, movieFixtures } from './fixtures/movies'
 
 const MOVIES_URL = '*/movies/'
 const MOVIE_DETAILS_URL = '*/movies/:movieId'
@@ -20,6 +20,13 @@ export const movieHandlers = [
     }
 
     return HttpResponse.json(movie)
+  }),
+  http.post(MOVIES_URL, async ({ request }) => {
+    const movie = (await request.json()) as Omit<MovieFixture, 'id'>
+
+    return HttpResponse.json({ id: 3, ...movie } satisfies MovieFixture, {
+      status: 201,
+    })
   }),
   http.delete(MOVIE_DETAILS_URL, ({ params }) => {
     const movieExists = movieFixtures.some(

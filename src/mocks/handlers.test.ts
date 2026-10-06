@@ -37,6 +37,25 @@ describe('movieHandlers', () => {
     await expect(response.text()).resolves.toBe('')
   })
 
+  it('creates a movie', async () => {
+    const response = await fetch('http://127.0.0.1:8000/movies/', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        title: 'Blade Runner',
+        release_year: 1982,
+        description: null,
+        genres: ['Science Fiction'],
+      }),
+    })
+
+    expect(response.status).toBe(201)
+    await expect(response.json()).resolves.toMatchObject({
+      id: 3,
+      title: 'Blade Runner',
+    })
+  })
+
   it.each([
     ['rateLimited', 429],
     ['serviceUnavailable', 503],
