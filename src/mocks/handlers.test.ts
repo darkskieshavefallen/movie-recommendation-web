@@ -56,6 +56,28 @@ describe('movieHandlers', () => {
     })
   })
 
+  it('replaces every editable field of a movie', async () => {
+    const response = await fetch('http://127.0.0.1:8000/movies/1', {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        title: 'Alien: Director’s Cut',
+        release_year: 2003,
+        description: 'The restored cut.',
+        genres: ['Horror'],
+      }),
+    })
+
+    expect(response.status).toBe(200)
+    await expect(response.json()).resolves.toEqual({
+      id: 1,
+      title: 'Alien: Director’s Cut',
+      release_year: 2003,
+      description: 'The restored cut.',
+      genres: ['Horror'],
+    })
+  })
+
   it.each([
     ['rateLimited', 429],
     ['serviceUnavailable', 503],

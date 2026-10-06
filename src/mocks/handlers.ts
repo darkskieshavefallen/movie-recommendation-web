@@ -28,6 +28,22 @@ export const movieHandlers = [
       status: 201,
     })
   }),
+  http.put(MOVIE_DETAILS_URL, async ({ params, request }) => {
+    const movieExists = movieFixtures.some(
+      ({ id }) => id === Number(params.movieId),
+    )
+
+    if (!movieExists) {
+      return HttpResponse.json({ detail: 'Movie not found' }, { status: 404 })
+    }
+
+    const movie = (await request.json()) as Omit<MovieFixture, 'id'>
+
+    return HttpResponse.json({
+      id: Number(params.movieId),
+      ...movie,
+    } satisfies MovieFixture)
+  }),
   http.delete(MOVIE_DETAILS_URL, ({ params }) => {
     const movieExists = movieFixtures.some(
       ({ id }) => id === Number(params.movieId),

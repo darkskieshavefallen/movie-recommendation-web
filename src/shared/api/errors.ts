@@ -5,6 +5,7 @@ export type ApiErrorKind = 'http' | 'network' | 'validation'
 export type ApiErrorCode =
   | 'network'
   | 'not_found'
+  | 'conflict'
   | 'validation'
   | 'rate_limited'
   | 'service_unavailable'
@@ -55,6 +56,11 @@ const errorMessages: Record<
     title: 'Not found',
     message: 'The requested resource could not be found.',
   },
+  conflict: {
+    title: 'Update conflict',
+    message:
+      'The movie changed while you were editing it. Review the current data and try again.',
+  },
   validation: {
     title: 'Check the entered data',
     message: 'Some data is invalid. Review it and try again.',
@@ -92,6 +98,10 @@ function getApiErrorCode(error: unknown): ApiErrorCode {
 
   if (error.status === 404) {
     return 'not_found'
+  }
+
+  if (error.status === 409) {
+    return 'conflict'
   }
 
   if (error.status === 429) {

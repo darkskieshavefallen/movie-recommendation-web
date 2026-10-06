@@ -1,13 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import type { MovieFormData } from '@/features/movie-form/model/movieFormSchema'
 import { apiClient } from '@/shared/api/client'
+import type { components } from '@/shared/api/generated/schema'
 import { queryKeys } from '@/shared/api/queryKeys'
+
+type MovieCreate = components['schemas']['MovieCreate']
 
 export function useCreateMovieMutation() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (movie: MovieFormData) => {
+    mutationFn: async (movie: MovieCreate) => {
       const { data } = await apiClient.POST('/movies/', {
         body: movie,
       })
