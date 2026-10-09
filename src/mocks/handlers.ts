@@ -1,8 +1,13 @@
 import { HttpResponse, http } from 'msw'
-import { type MovieFixture, movieFixtures } from './fixtures/movies'
+import {
+  type MovieFixture,
+  movieFixtures,
+  movieRecommendationsFixtures,
+} from './fixtures/movies'
 
 const MOVIES_URL = '*/movies/'
 const MOVIE_DETAILS_URL = '*/movies/:movieId'
+const MOVIE_RECOMMENDATIONS_URL = '*/movies/:movieId/recommendations'
 
 export const movieHandlers = [
   http.get(MOVIES_URL, ({ request }) => {
@@ -11,6 +16,26 @@ export const movieHandlers = [
     const limit = Number(url.searchParams.get('limit') ?? 100)
 
     return HttpResponse.json(movieFixtures.slice(offset, offset + limit))
+  }),
+  http.get(MOVIE_RECOMMENDATIONS_URL, ({ params, request }) => {
+    const movieId = Number(params.movieId)
+    const movieExists = movieFixtures.some(({ id }) => id === movieId)
+
+    if (!movieExists) {
+      return new HttpResponse(null, { status: 404 })
+    }
+
+    const url = new URL(request.url)
+    const limit = Number(url.searchParams.get('limit') ?? 5)
+    const fixture = movieRecommendationsFixtures[movieId] ?? {
+      source_movie_id: movieId,
+      recommendations: [],
+    }
+
+    return HttpResponse.json({
+      ...fixture,
+      recommendations: fixture.recommendations.slice(0, limit),
+    })
   }),
   http.get(MOVIE_DETAILS_URL, ({ params }) => {
     const movie = movieFixtures.find(({ id }) => id === Number(params.movieId))

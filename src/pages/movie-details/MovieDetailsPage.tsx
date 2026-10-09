@@ -1,21 +1,38 @@
 import { Link } from '@tanstack/react-router'
 import { ArrowLeftIcon, CalendarDaysIcon, PencilIcon } from 'lucide-react'
+import type { ReactNode } from 'react'
 import { useMovieQuery } from '@/entities/movie/api/useMovieQuery'
+import { useMovieRecommendationsQuery } from '@/entities/movie/api/useMovieRecommendationsQuery'
 import { normalizeGenres } from '@/entities/movie/model/genres'
 import { parseMovieId } from '@/entities/movie/model/movieId'
+import type { MovieId } from '@/entities/movie/model/types'
+import { RecommendationCard } from '@/entities/movie/ui/RecommendationCard'
 import { DeleteMovieDialog } from '@/features/delete-movie/ui/DeleteMovieDialog'
+import { RecommendationLimitControl } from '@/features/recommendation-limit/ui/RecommendationLimitControl'
 import { toApiErrorViewModel } from '@/shared/api/errors'
 import { buttonVariants } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
-import type { MovieId } from '../../entities/movie/model/types'
+import { RecommendationsEmptyState } from './ui/RecommendationsEmptyState'
+import { RecommendationsErrorState } from './ui/RecommendationsErrorState'
+import { RecommendationsSkeleton } from './ui/RecommendationsSkeleton'
 
 type MovieDetailsPageProps = {
   movieId: MovieId
+  onRecommendationsLimitChange: (limit: number) => void
+  recommendationsLimit: number
 }
 
-export function MovieDetailsPage({ movieId }: MovieDetailsPageProps) {
+export function MovieDetailsPage({
+  movieId,
+  onRecommendationsLimitChange,
+  recommendationsLimit,
+}: MovieDetailsPageProps) {
   const parsedMovieId = parseMovieId(movieId)
   const movieQuery = useMovieQuery(parsedMovieId)
+  const recommendationsQuery = useMovieRecommendationsQuery({
+    limit: recommendationsLimit,
+    movieId: parsedMovieId,
+  })
 
   if (parsedMovieId === null) {
     return <MovieNotFound />
@@ -52,6 +69,34 @@ export function MovieDetailsPage({ movieId }: MovieDetailsPageProps) {
 
   const movie = movieQuery.data
   const genres = normalizeGenres(movie.genres)
+  let recommendationsContent: ReactNode
+
+  if (recommendationsQuery.isPending) {
+    recommendationsContent = <RecommendationsSkeleton />
+  } else if (recommendationsQuery.isError) {
+    recommendationsContent = (
+      <RecommendationsErrorState
+        error={toApiErrorViewModel(recommendationsQuery.error)}
+        isRetrying={recommendationsQuery.isFetching}
+        onRetry={() => void recommendationsQuery.refetch()}
+      />
+    )
+  } else if (recommendationsQuery.data.recommendations.length === 0) {
+    recommendationsContent = <RecommendationsEmptyState />
+  } else {
+    recommendationsContent = (
+      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {recommendationsQuery.data.recommendations.map((recommendation) => (
+          <li key={recommendation.movie_id} className="min-w-0">
+            <RecommendationCard
+              recommendation={recommendation}
+              limit={recommendationsLimit}
+            />
+          </li>
+        ))}
+      </ul>
+    )
+  }
 
   return (
     <article className="grid gap-6" aria-labelledby="movie-title">
@@ -113,6 +158,26 @@ export function MovieDetailsPage({ movieId }: MovieDetailsPageProps) {
           </div>
         </CardContent>
       </Card>
+      <section className="grid gap-4" aria-labelledby="recommendations-title">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="grid gap-1">
+            <h2
+              id="recommendations-title"
+              className="font-heading text-2xl font-semibold tracking-tight"
+            >
+              Similar movies
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Recommendations are ranked by genres shared with {movie.title}.
+            </p>
+          </div>
+          <RecommendationLimitControl
+            limit={recommendationsLimit}
+            onLimitChange={onRecommendationsLimitChange}
+          />
+        </div>
+        {recommendationsContent}
+      </section>
     </article>
   )
 }

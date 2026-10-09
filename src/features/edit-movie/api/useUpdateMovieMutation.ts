@@ -39,6 +39,9 @@ export function useUpdateMovieMutation() {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.movies.lists(),
       })
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.movies.recommendations(),
+      })
     },
   })
 }

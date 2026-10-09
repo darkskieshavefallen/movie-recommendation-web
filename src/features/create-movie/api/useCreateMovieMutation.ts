@@ -25,6 +25,9 @@ export function useCreateMovieMutation() {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.movies.lists(),
       })
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.movies.recommendations(),
+      })
     },
   })
 }

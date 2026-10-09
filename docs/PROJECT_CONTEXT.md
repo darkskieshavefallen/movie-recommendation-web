@@ -14,7 +14,7 @@ response DTOs by hand.
 
 ## Current implementation
 
-Web Sprints 1–3 provide:
+Web Sprints 1–4 provide:
 
 - application shell, responsive design tokens, dark mode, and typed routes;
 - shared OpenAPI client, TanStack Query cache, safe API error mapping, and MSW
@@ -24,7 +24,13 @@ Web Sprints 1–3 provide:
 - complete create, read, full-replacement update, and delete flows;
 - field-level FastAPI 422 feedback and safe CRUD toast notifications;
 - explicit loading, empty, offline, not-found, conflict, and server-error
-  states.
+  states;
+- explainable local-movie recommendations with backend-ranked ordering,
+  matching-genre badges, and a URL-backed limit;
+- direct and cyclic recommendation navigation without retaining the previous
+  source response;
+- recommendation loading, successful empty, safe error, retry, responsive, and
+  reduced-motion states.
 
 Layering follows `app/routes/pages -> features -> entities -> shared`. Server
 state belongs to TanStack Query, route state belongs to TanStack Router, and
@@ -58,6 +64,14 @@ The CRUD MVP suite covers:
 - cache invalidation and mutation navigation;
 - `404`, `409`, network, service, and server failures.
 
+The recommendation suite additionally covers:
+
+- exact backend ordering and matching genres;
+- limit requests and URL persistence;
+- loading, empty, error, and retry behavior;
+- direct route refresh and cyclic source navigation;
+- cache invalidation after catalog mutations.
+
 Before completing a sprint, run:
 
 ```bash
@@ -81,5 +95,5 @@ and PostgreSQL stack at the documented localhost origins.
 - Concurrent edits have no version token; the UI can explain a `409` if the
   backend reports one, but cannot merge competing edits.
 
-The next planned milestone adds explainable recommendations without changing
-these CRUD ownership boundaries.
+The next planned milestone extends external search without changing these CRUD
+or recommendation ownership boundaries.
