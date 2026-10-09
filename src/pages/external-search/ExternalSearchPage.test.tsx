@@ -14,6 +14,25 @@ afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 describe('external search form', () => {
+  it('explains the external, read-only data boundary and credits TMDB', async () => {
+    await renderRoute('/external-search')
+
+    expect(
+      screen.getByText(
+        'This product uses the TMDB API but is not endorsed or certified by TMDB.',
+      ),
+    ).toBeVisible()
+    expect(
+      screen.getByText(
+        'External results are read-only and are not saved to your local movie collection.',
+      ),
+    ).toBeVisible()
+    expect(screen.getByRole('img', { name: 'TMDB' })).toBeVisible()
+    expect(
+      screen.getByRole('link', { name: /TMDB API terms of use/i }),
+    ).toHaveAttribute('href', 'https://www.themoviedb.org/api-terms-of-use')
+  })
+
   it('stores only a submitted query in the URL', async () => {
     const requestedQueries: string[] = []
 

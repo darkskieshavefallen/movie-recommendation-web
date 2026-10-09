@@ -5,6 +5,7 @@ import { ExternalMovieCard } from '@/entities/external-movie/ui/ExternalMovieCar
 import { ExternalSearchForm } from '@/features/external-search/ui/ExternalSearchForm'
 import type { ExternalSearch } from '@/shared/lib/router/searchParams'
 import { PlaceholderPage } from '@/shared/ui/PlaceholderPage'
+import { ExternalSearchAttribution } from './ui/ExternalSearchAttribution'
 import { ExternalSearchEmptyState } from './ui/ExternalSearchEmptyState'
 import { ExternalSearchErrorState } from './ui/ExternalSearchErrorState'
 import { ExternalSearchSkeleton } from './ui/ExternalSearchSkeleton'
@@ -78,6 +79,7 @@ export function ExternalSearchPage({
         />
       </div>
       {searchContent}
+      <ExternalSearchAttribution />
     </PlaceholderPage>
   )
 }
