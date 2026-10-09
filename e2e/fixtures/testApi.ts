@@ -16,6 +16,10 @@ type ApiRequestRecord = {
 }
 
 type TestApi = {
+  externalSearchError: {
+    detail: string
+    status: number
+  } | null
   movies: MovieRead[]
   requests: ApiRequestRecord[]
 }
@@ -123,6 +127,15 @@ async function installTestApi(page: Page, api: TestApi) {
     }
 
     if (pathname === '/external/movies/search' && method === 'GET') {
+      if (api.externalSearchError) {
+        await fulfillJson(
+          route,
+          { detail: api.externalSearchError.detail },
+          api.externalSearchError.status,
+        )
+        return
+      }
+
       await fulfillJson(route, {
         ...externalMovieSearchFixture,
         query: url.searchParams.get('query') ?? '',
@@ -142,6 +155,7 @@ export const test = base.extend<{ api: TestApi }>({
   api: [
     async ({ page }, use) => {
       const api: TestApi = {
+        externalSearchError: null,
         movies: structuredClone(movieFixtures),
         requests: [],
       }

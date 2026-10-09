@@ -346,6 +346,10 @@ requests are intercepted by the per-test in-memory API fixture, so E2E tests do
 not require FastAPI, PostgreSQL, TMDB, or credentials. Every test receives fresh
 movie state and may run independently or in parallel.
 
+The suite covers mobile catalog pagination, create/edit/delete, movie details
+and recommendation navigation, external search, and the disabled-provider
+state through visible user behavior and web-first assertions.
+
 Screenshots and videos are retained only for failed tests. CI retries once and
 records a trace for that retry; the HTML report and failure artifacts are
 uploaded for seven days when the browser job fails.

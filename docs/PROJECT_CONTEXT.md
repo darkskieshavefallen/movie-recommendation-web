@@ -109,6 +109,12 @@ role and label locators, run independently, and never require the real backend,
 database, provider, or secrets. On failure, CI retains screenshots, video,
 trace, error context, and the HTML report for diagnosis.
 
+The critical-flow suite covers catalog pagination at a mobile viewport, the
+complete create/edit/delete journey, movie details and recommendation
+navigation, successful external search without importing results, and the
+disabled-provider state. The flows use only web-first assertions and can run in
+parallel against isolated state.
+
 All provider scenarios in the automated suite are intercepted by MSW at the
 FastAPI route. Tests and CI never call TMDB or load a real credential. A single
 bounded real-provider query is reserved for the local manual smoke documented
