@@ -1,6 +1,11 @@
+import type { ReactNode } from 'react'
+import { useExternalMovieSearchQuery } from '@/entities/external-movie/api/useExternalMovieSearchQuery'
+import { ExternalMovieCard } from '@/entities/external-movie/ui/ExternalMovieCard'
 import { ExternalSearchForm } from '@/features/external-search/ui/ExternalSearchForm'
 import type { ExternalSearch } from '@/shared/lib/router/searchParams'
 import { PlaceholderPage } from '@/shared/ui/PlaceholderPage'
+import { ExternalSearchEmptyState } from './ui/ExternalSearchEmptyState'
+import { ExternalSearchSkeleton } from './ui/ExternalSearchSkeleton'
 
 type ExternalSearchPageProps = ExternalSearch & {
   onSearch: (query: string) => void
@@ -10,6 +15,61 @@ export function ExternalSearchPage({
   query,
   onSearch,
 }: ExternalSearchPageProps) {
+  const searchQuery = useExternalMovieSearchQuery(query ?? null)
+  let searchContent: ReactNode
+
+  if (!query) {
+    searchContent = (
+      <p className="text-sm text-muted-foreground" role="status">
+        Enter a movie title to start an external search.
+      </p>
+    )
+  } else if (searchQuery.isPending) {
+    searchContent = <ExternalSearchSkeleton />
+  } else if (searchQuery.isError) {
+    searchContent = (
+      <section
+        className="rounded-xl border border-destructive/30 bg-card p-6"
+        role="alert"
+      >
+        <h2 className="font-heading text-xl font-semibold">
+          External search unavailable
+        </h2>
+        <p className="mt-2 text-muted-foreground">
+          The external catalog could not complete this search. Your local
+          collection is unaffected.
+        </p>
+      </section>
+    )
+  } else if (searchQuery.data.results.length === 0) {
+    searchContent = <ExternalSearchEmptyState query={query} />
+  } else {
+    searchContent = (
+      <section className="grid gap-4" aria-labelledby="external-results-title">
+        <div className="grid gap-1">
+          <p className="text-sm font-medium text-primary">External results</p>
+          <h2
+            id="external-results-title"
+            className="font-heading text-2xl font-semibold tracking-tight"
+          >
+            Results for “{query}”
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            These movies come from an external catalog and are not part of your
+            local collection.
+          </p>
+        </div>
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {searchQuery.data.results.map((movie) => (
+            <li key={movie.external_id} className="min-w-0">
+              <ExternalMovieCard movie={movie} />
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
   return (
     <PlaceholderPage
       title="External movie search"
@@ -21,12 +81,8 @@ export function ExternalSearchPage({
           initialQuery={query}
           onSearch={onSearch}
         />
-        <p className="text-sm text-muted-foreground" role="status">
-          {query
-            ? `Confirmed search: ${query}`
-            : 'Enter a movie title to start an external search.'}
-        </p>
       </div>
+      {searchContent}
     </PlaceholderPage>
   )
 }

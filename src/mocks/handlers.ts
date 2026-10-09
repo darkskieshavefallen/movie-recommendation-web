@@ -1,4 +1,5 @@
 import { HttpResponse, http } from 'msw'
+import { externalMovieSearchFixture } from './fixtures/externalMovies'
 import {
   type MovieFixture,
   movieFixtures,
@@ -8,6 +9,18 @@ import {
 const MOVIES_URL = '*/movies/'
 const MOVIE_DETAILS_URL = '*/movies/:movieId'
 const MOVIE_RECOMMENDATIONS_URL = '*/movies/:movieId/recommendations'
+const EXTERNAL_MOVIE_SEARCH_URL = '*/external/movies/search'
+
+export const externalMovieHandlers = [
+  http.get(EXTERNAL_MOVIE_SEARCH_URL, ({ request }) => {
+    const query = new URL(request.url).searchParams.get('query') ?? ''
+
+    return HttpResponse.json({
+      ...externalMovieSearchFixture,
+      query,
+    })
+  }),
+]
 
 export const movieHandlers = [
   http.get(MOVIES_URL, ({ request }) => {
