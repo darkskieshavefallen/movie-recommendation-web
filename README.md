@@ -262,6 +262,10 @@ browser environment:
 The real-provider step is a manual smoke check only. CI and automated tests stay
 deterministic and credential-free.
 
+The latest real FastAPI/PostgreSQL compatibility run, including exact
+repository revisions and disposable-data results, is recorded in
+[`docs/REAL_BACKEND_SMOKE.md`](docs/REAL_BACKEND_SMOKE.md).
+
 ## Accessibility and responsive baseline
 
 The Sprint 6 accessibility baseline covers the catalog, create form, movie

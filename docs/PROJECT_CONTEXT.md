@@ -135,6 +135,11 @@ pnpm test:e2e
 The manual smoke checklist lives in `README.md` and must use the real FastAPI
 and PostgreSQL stack at the documented localhost origins.
 
+The completed ANT-66 compatibility run is recorded in
+`docs/REAL_BACKEND_SMOKE.md` with the exact frontend and backend revisions,
+fresh migration and seed evidence, real CORS headers, and browser CRUD and
+recommendation results.
+
 ## Known API limitations
 
 - `GET /movies/` exposes `offset` and `limit` but no total count.
