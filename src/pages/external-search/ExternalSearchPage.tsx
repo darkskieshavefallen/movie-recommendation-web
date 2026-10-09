@@ -1,33 +1,30 @@
-import { SearchIcon } from 'lucide-react'
-import { Input } from '@/shared/ui/input'
-import type { ExternalSearch } from '../../shared/lib/router/searchParams'
-import { PlaceholderPage } from '../../shared/ui/PlaceholderPage'
+import { ExternalSearchForm } from '@/features/external-search/ui/ExternalSearchForm'
+import type { ExternalSearch } from '@/shared/lib/router/searchParams'
+import { PlaceholderPage } from '@/shared/ui/PlaceholderPage'
 
-export function ExternalSearchPage({ query }: ExternalSearch) {
+type ExternalSearchPageProps = ExternalSearch & {
+  onSearch: (query: string) => void
+}
+
+export function ExternalSearchPage({
+  query,
+  onSearch,
+}: ExternalSearchPageProps) {
   return (
     <PlaceholderPage
       title="External movie search"
-      description="External provider results will be implemented in a later sprint."
+      description="Search the optional external catalog without changing your local collection."
     >
-      <div className="grid max-w-2xl gap-2">
-        <label htmlFor="external-query" className="text-sm font-medium">
-          Search query
-        </label>
-        <div className="relative">
-          <SearchIcon
-            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
-            aria-hidden="true"
-          />
-          <Input
-            id="external-query"
-            name="query"
-            defaultValue={query}
-            placeholder="Search an external movie catalog"
-            className="pl-9"
-          />
-        </div>
-        <p className="text-sm text-muted-foreground">
-          Typed search param: query={query ?? 'not set'}
+      <div className="grid max-w-2xl gap-5 rounded-xl bg-card p-4 ring-1 ring-foreground/10 sm:p-6">
+        <ExternalSearchForm
+          key={query ?? 'empty-query'}
+          initialQuery={query}
+          onSearch={onSearch}
+        />
+        <p className="text-sm text-muted-foreground" role="status">
+          {query
+            ? `Confirmed search: ${query}`
+            : 'Enter a movie title to start an external search.'}
         </p>
       </div>
     </PlaceholderPage>

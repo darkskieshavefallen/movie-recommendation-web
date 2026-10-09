@@ -9,6 +9,14 @@ export const Route = createFileRoute('/external-search')({
 
 function ExternalSearchRoute() {
   const search = Route.useSearch()
+  const navigate = Route.useNavigate()
 
-  return <ExternalSearchPage {...search} />
+  return (
+    <ExternalSearchPage
+      {...search}
+      onSearch={(query) => {
+        void navigate({ search: { query } })
+      }}
+    />
+  )
 }
