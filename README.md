@@ -188,6 +188,42 @@ origin and may be rejected.
   part of the current contract.
 - Provider credentials remain backend-only and are never sent to the browser.
 
+## Explainable recommendations
+
+The completed fourth web sprint adds recommendations to each local movie detail
+page:
+
+- `GET /movies/{movie_id}/recommendations` is consumed through the shared typed
+  API client and cached separately for every source movie and limit;
+- recommendation cards preserve the backend order and show the exact matching
+  genres returned by the API;
+- the selected limit is stored in the URL and carried through recommendation
+  links, so direct navigation and refresh reproduce the same view;
+- loading, successful empty, safe error, and retry states are explicit;
+- create, update, and delete operations invalidate affected recommendation
+  caches so a previously empty or ranked result does not remain stale;
+- responsive cards support long titles and genres, while view transitions
+  respect `prefers-reduced-motion`.
+
+### Manual local recommendation smoke
+
+With the backend demo catalog and frontend running at the documented localhost
+origins:
+
+1. Open a movie that shares a genre with at least one other local movie.
+2. Confirm recommendation order and matching-genre badges agree with the API
+   response.
+3. Change **Show recommendations** and confirm `limit` changes in the URL and
+   the visible result count follows it.
+4. Open a recommendation, refresh the detail route, and confirm both the source
+   movie and selected limit remain correct.
+5. Navigate back through a recommendation cycle and confirm content from the
+   previous source is not retained.
+6. Open a movie with no matches and confirm the empty state is presented as a
+   successful result.
+7. Create or edit a matching movie and confirm an already-open recommendation
+   view refreshes instead of retaining its cached empty result.
+
 ## Checks
 
 Run formatting, linting, and import organization checks:

@@ -27,8 +27,14 @@ describe('movie recommendations', () => {
       recommendationHeadings.map(({ textContent }) => textContent),
     ).toEqual(['Arrival', 'Blade Runner'])
     expect(
-      within(section).getAllByRole('list', { name: 'Matching genres' })[0],
-    ).toHaveTextContent('Science Fiction')
+      within(section)
+        .getAllByRole('list', { name: 'Matching genres' })
+        .map((list) =>
+          within(list)
+            .getAllByRole('listitem')
+            .map(({ textContent }) => textContent),
+        ),
+    ).toEqual([['Science Fiction'], ['Science Fiction', 'Thriller']])
     expect(
       within(section).getByRole('link', { name: /Arrival/ }),
     ).toHaveAttribute('href', '/movies/2?limit=2')
@@ -177,6 +183,49 @@ describe('movie recommendations', () => {
     expect(
       await screen.findByRole('heading', { name: 'Arrival', level: 3 }),
     ).toBeVisible()
+  })
+
+  it('restores the recommendation source and limit on a direct route refresh', async () => {
+    const recommendationRequests: string[] = []
+
+    server.use(
+      http.get('*/movies/:movieId/recommendations', ({ params, request }) => {
+        recommendationRequests.push(request.url)
+
+        return HttpResponse.json({
+          source_movie_id: Number(params.movieId),
+          recommendations: [
+            {
+              movie_id: 1,
+              title: 'Alien',
+              release_year: 1979,
+              matching_genres: ['Science Fiction'],
+            },
+          ],
+        } satisfies MovieRecommendations)
+      }),
+    )
+
+    await renderRoute('/movies/2?limit=1')
+
+    expect(
+      await screen.findByRole('heading', { name: 'Arrival', level: 1 }),
+    ).toBeVisible()
+    expect(
+      screen.getByRole('combobox', { name: 'Number of recommendations' }),
+    ).toHaveValue('1')
+    expect(
+      await screen.findByRole('link', { name: /Alien 1979/ }),
+    ).toHaveAttribute('href', '/movies/1?limit=1')
+    expect(recommendationRequests).toHaveLength(1)
+    const [recommendationRequest] = recommendationRequests
+    if (!recommendationRequest) {
+      throw new Error('Expected one recommendation request')
+    }
+    const recommendationUrl = new URL(recommendationRequest)
+
+    expect(recommendationUrl.pathname).toBe('/movies/2/recommendations')
+    expect(recommendationUrl.searchParams.get('limit')).toBe('1')
   })
 
   it('renders long recommendation titles and genres without truncating content', async () => {
