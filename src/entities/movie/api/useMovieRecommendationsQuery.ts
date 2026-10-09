@@ -13,7 +13,7 @@ export function useMovieRecommendationsQuery({
   movieId,
 }: MovieRecommendationsQueryParams) {
   return useQuery({
-    queryKey: queryKeys.movies.recommendations({
+    queryKey: queryKeys.movies.recommendation({
       limit,
       movieId: movieId ?? 0,
     }),

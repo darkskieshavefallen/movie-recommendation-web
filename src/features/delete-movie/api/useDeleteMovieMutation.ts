@@ -16,12 +16,18 @@ export function useDeleteMovieMutation() {
       queryClient.removeQueries({
         queryKey: queryKeys.movies.detail(movieId),
       })
+      queryClient.removeQueries({
+        queryKey: queryKeys.movies.recommendationsFor(movieId),
+      })
       queryClient.setQueriesData<Movie[]>(
         { queryKey: queryKeys.movies.lists() },
         (movies) => movies?.filter((movie) => movie.id !== movieId),
       )
       void queryClient.invalidateQueries({
         queryKey: queryKeys.movies.lists(),
+      })
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.movies.recommendations(),
       })
     },
   })

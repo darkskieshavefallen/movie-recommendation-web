@@ -26,12 +26,15 @@ export function RecommendationCard({
         to="/movies/$movieId"
         params={{ movieId: String(recommendation.movie_id) }}
         search={{ limit }}
-        className="group block h-full rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+        viewTransition
+        className="group block h-full min-w-0 rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
       >
         <Card className="h-full transition-[transform,box-shadow] duration-200 group-hover:-translate-y-0.5 group-hover:shadow-md">
           <CardHeader>
             <CardTitle>
-              <h3 id={titleId}>{recommendation.title}</h3>
+              <h3 id={titleId} className="break-words">
+                {recommendation.title}
+              </h3>
             </CardTitle>
             <CardDescription className="flex items-center gap-1.5">
               <CalendarDaysIcon className="size-4" aria-hidden="true" />
@@ -50,7 +53,7 @@ export function RecommendationCard({
               {recommendation.matching_genres.map((genre) => (
                 <li
                   key={genre.toLowerCase()}
-                  className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary"
+                  className="max-w-full rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium break-words whitespace-normal text-primary"
                 >
                   {genre}
                 </li>

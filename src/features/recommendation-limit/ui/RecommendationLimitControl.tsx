@@ -20,7 +20,7 @@ export function RecommendationLimitControl({
   onLimitChange,
 }: RecommendationLimitControlProps) {
   return (
-    <label className="flex items-center gap-2 text-sm font-medium">
+    <label className="flex flex-wrap items-center gap-2 text-sm font-medium">
       Show
       <select
         aria-label="Number of recommendations"

@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { ArrowLeftIcon, CalendarDaysIcon, PencilIcon } from 'lucide-react'
+import type { ReactNode } from 'react'
 import { useMovieQuery } from '@/entities/movie/api/useMovieQuery'
 import { useMovieRecommendationsQuery } from '@/entities/movie/api/useMovieRecommendationsQuery'
 import { normalizeGenres } from '@/entities/movie/model/genres'
@@ -11,6 +12,9 @@ import { RecommendationLimitControl } from '@/features/recommendation-limit/ui/R
 import { toApiErrorViewModel } from '@/shared/api/errors'
 import { buttonVariants } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
+import { RecommendationsEmptyState } from './ui/RecommendationsEmptyState'
+import { RecommendationsErrorState } from './ui/RecommendationsErrorState'
+import { RecommendationsSkeleton } from './ui/RecommendationsSkeleton'
 
 type MovieDetailsPageProps = {
   movieId: MovieId
@@ -65,6 +69,34 @@ export function MovieDetailsPage({
 
   const movie = movieQuery.data
   const genres = normalizeGenres(movie.genres)
+  let recommendationsContent: ReactNode
+
+  if (recommendationsQuery.isPending) {
+    recommendationsContent = <RecommendationsSkeleton />
+  } else if (recommendationsQuery.isError) {
+    recommendationsContent = (
+      <RecommendationsErrorState
+        error={toApiErrorViewModel(recommendationsQuery.error)}
+        isRetrying={recommendationsQuery.isFetching}
+        onRetry={() => void recommendationsQuery.refetch()}
+      />
+    )
+  } else if (recommendationsQuery.data.recommendations.length === 0) {
+    recommendationsContent = <RecommendationsEmptyState />
+  } else {
+    recommendationsContent = (
+      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {recommendationsQuery.data.recommendations.map((recommendation) => (
+          <li key={recommendation.movie_id} className="min-w-0">
+            <RecommendationCard
+              recommendation={recommendation}
+              limit={recommendationsLimit}
+            />
+          </li>
+        ))}
+      </ul>
+    )
+  }
 
   return (
     <article className="grid gap-6" aria-labelledby="movie-title">
@@ -144,18 +176,7 @@ export function MovieDetailsPage({
             onLimitChange={onRecommendationsLimitChange}
           />
         </div>
-        {recommendationsQuery.data ? (
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {recommendationsQuery.data.recommendations.map((recommendation) => (
-              <li key={recommendation.movie_id} className="min-w-0">
-                <RecommendationCard
-                  recommendation={recommendation}
-                  limit={recommendationsLimit}
-                />
-              </li>
-            ))}
-          </ul>
-        ) : null}
+        {recommendationsContent}
       </section>
     </article>
   )

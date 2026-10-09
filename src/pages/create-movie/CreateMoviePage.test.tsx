@@ -5,6 +5,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import type { MovieFixture } from '@/mocks/fixtures/movies'
 import { movieFixtures } from '@/mocks/fixtures/movies'
 import { movieHandlers } from '@/mocks/handlers'
+import { queryKeys } from '@/shared/api/queryKeys'
 import { renderRoute } from '@/test/renderRoute'
 
 const server = setupServer(...movieHandlers)
@@ -51,7 +52,15 @@ describe('create movie page', () => {
       }),
     )
 
-    const { user } = await renderRoute('/movies/new')
+    const { queryClient, user } = await renderRoute('/movies/new')
+    const cachedRecommendationsKey = queryKeys.movies.recommendation({
+      limit: 5,
+      movieId: 1,
+    })
+    queryClient.setQueryData(cachedRecommendationsKey, {
+      source_movie_id: 1,
+      recommendations: [],
+    })
     const fields = await fillValidMovieForm()
 
     await user.type(fields.title, createdMovie.title)
@@ -67,6 +76,9 @@ describe('create movie page', () => {
       }),
     ).toBeVisible()
     expect(await screen.findByText('Movie created')).toBeVisible()
+    expect(
+      queryClient.getQueryState(cachedRecommendationsKey)?.isInvalidated,
+    ).toBe(true)
 
     await user.click(screen.getByRole('link', { name: 'Back to catalog' }))
 

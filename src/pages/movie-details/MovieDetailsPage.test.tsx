@@ -1,5 +1,5 @@
 import { screen, waitFor, within } from '@testing-library/react'
-import { HttpResponse, http } from 'msw'
+import { delay, HttpResponse, http } from 'msw'
 import { setupServer } from 'msw/node'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import type { MovieRecommendations } from '@/entities/movie/model/types'
@@ -77,5 +77,134 @@ describe('movie recommendations', () => {
     }
 
     expect(recommendationLink).toHaveFocus()
+  })
+
+  it('shows a dedicated loading state while recommendations are pending', async () => {
+    server.use(
+      http.get('*/movies/:movieId/recommendations', async () => {
+        await delay('infinite')
+        return HttpResponse.json({
+          source_movie_id: 1,
+          recommendations: [],
+        } satisfies MovieRecommendations)
+      }),
+    )
+
+    await renderRoute('/movies/1')
+
+    expect(
+      await screen.findByRole('heading', { name: 'Alien', level: 1 }),
+    ).toBeVisible()
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Loading recommendations…',
+    )
+  })
+
+  it('treats an empty recommendation list as a successful state', async () => {
+    server.use(
+      http.get('*/movies/:movieId/recommendations', ({ params }) =>
+        HttpResponse.json({
+          source_movie_id: Number(params.movieId),
+          recommendations: [],
+        } satisfies MovieRecommendations),
+      ),
+    )
+
+    await renderRoute('/movies/1')
+
+    expect(
+      await screen.findByRole('heading', { name: 'No similar movies yet' }),
+    ).toBeVisible()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  it('explains a recommendation failure and retries it', async () => {
+    let isOffline = true
+
+    server.use(
+      http.get('*/movies/:movieId/recommendations', () =>
+        isOffline
+          ? HttpResponse.error()
+          : HttpResponse.json({
+              source_movie_id: 1,
+              recommendations: [
+                {
+                  movie_id: 2,
+                  title: 'Arrival',
+                  release_year: 2016,
+                  matching_genres: ['Science Fiction'],
+                },
+              ],
+            } satisfies MovieRecommendations),
+      ),
+    )
+
+    const { user } = await renderRoute('/movies/1')
+    const retryButton = await screen.findByRole('button', { name: 'Try again' })
+
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Recommendations unavailable',
+    )
+
+    isOffline = false
+    await user.click(retryButton)
+
+    expect(
+      await screen.findByRole('heading', { name: 'Arrival', level: 3 }),
+    ).toBeVisible()
+  })
+
+  it('supports cyclic recommendation navigation without retaining old content', async () => {
+    const { user } = await renderRoute('/movies/1?limit=2')
+
+    await user.click(await screen.findByRole('link', { name: /Arrival/ }))
+
+    expect(
+      await screen.findByRole('heading', { name: 'Arrival', level: 1 }),
+    ).toBeVisible()
+    expect(
+      await screen.findByRole('link', { name: /Alien 1979/ }),
+    ).toHaveAttribute('href', '/movies/1?limit=2')
+    expect(
+      screen.queryByRole('heading', { name: 'Blade Runner', level: 3 }),
+    ).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('link', { name: /Alien 1979/ }))
+
+    expect(
+      await screen.findByRole('heading', { name: 'Alien', level: 1 }),
+    ).toBeVisible()
+    expect(
+      await screen.findByRole('heading', { name: 'Arrival', level: 3 }),
+    ).toBeVisible()
+  })
+
+  it('renders long recommendation titles and genres without truncating content', async () => {
+    const longTitle =
+      'A Very Long Recommendation Title That Must Remain Available to Readers'
+    const longGenre = 'Speculative Science Fiction With An Unusually Long Name'
+
+    server.use(
+      http.get('*/movies/:movieId/recommendations', () =>
+        HttpResponse.json({
+          source_movie_id: 1,
+          recommendations: [
+            {
+              movie_id: 20,
+              title: longTitle,
+              release_year: 2026,
+              matching_genres: [longGenre],
+            },
+          ],
+        } satisfies MovieRecommendations),
+      ),
+    )
+
+    await renderRoute('/movies/1')
+
+    expect(
+      await screen.findByRole('heading', { name: longTitle, level: 3 }),
+    ).toBeVisible()
+    expect(screen.getByText(longGenre)).toBeVisible()
   })
 })
