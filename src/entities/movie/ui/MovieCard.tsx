@@ -19,7 +19,7 @@ export function MovieCard({ movie }: MovieCardProps) {
   const titleId = `movie-${movie.id}-title`
 
   return (
-    <article aria-labelledby={titleId} className="h-full">
+    <article aria-labelledby={titleId} className="h-full min-w-0">
       <Link
         to="/movies/$movieId"
         params={{ movieId: String(movie.id) }}
@@ -28,7 +28,9 @@ export function MovieCard({ movie }: MovieCardProps) {
         <Card className="h-full transition-[transform,box-shadow] duration-200 group-hover:-translate-y-0.5 group-hover:shadow-md">
           <CardHeader>
             <CardTitle>
-              <h2 id={titleId}>{movie.title}</h2>
+              <h2 id={titleId} className="break-words">
+                {movie.title}
+              </h2>
             </CardTitle>
             <CardDescription className="flex items-center gap-1.5">
               <CalendarDaysIcon className="size-4" aria-hidden="true" />

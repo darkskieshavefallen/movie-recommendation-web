@@ -87,6 +87,34 @@ The external-search suite additionally covers:
 - manual retry after transient failure and suppression of raw response details;
 - the TMDB credit and the external-results-not-saved boundary.
 
+The Sprint 6 accessibility baseline additionally covers:
+
+- automated axe-core audits of the catalog, create form, movie details and
+  recommendations, and external search routes;
+- keyboard route navigation with focus moved to updated main content;
+- delete-dialog focus containment and restoration after `Escape`;
+- current-page navigation semantics, ordered headings, long-content wrapping,
+  and reduced-motion behavior for overlays and notifications;
+- browser layout checks at 320, 768, and 1440 CSS pixels with no horizontal
+  overflow on the key routes.
+
+Contrast remains a real-browser/manual check because jsdom does not provide the
+layout and canvas color engine axe needs for that rule. Both theme palettes use
+WCAG AA text pairs for foreground, muted, primary, and destructive content.
+
+Playwright provides the browser-level E2E harness for Sprint 6. It starts an
+isolated Vite server, runs required Chromium tests, and intercepts the complete
+frontend API boundary with fresh in-memory state per test. Tests use accessible
+role and label locators, run independently, and never require the real backend,
+database, provider, or secrets. On failure, CI retains screenshots, video,
+trace, error context, and the HTML report for diagnosis.
+
+The critical-flow suite covers catalog pagination at a mobile viewport, the
+complete create/edit/delete journey, movie details and recommendation
+navigation, successful external search without importing results, and the
+disabled-provider state. The flows use only web-first assertions and can run in
+parallel against isolated state.
+
 All provider scenarios in the automated suite are intercepted by MSW at the
 FastAPI route. Tests and CI never call TMDB or load a real credential. A single
 bounded real-provider query is reserved for the local manual smoke documented
@@ -101,10 +129,22 @@ pnpm check
 pnpm typecheck
 pnpm test
 pnpm build
+pnpm test:e2e
 ```
 
 The manual smoke checklist lives in `README.md` and must use the real FastAPI
 and PostgreSQL stack at the documented localhost origins.
+
+The completed ANT-66 compatibility run is recorded in
+`docs/REAL_BACKEND_SMOKE.md` with the exact frontend and backend revisions,
+fresh migration and seed evidence, real CORS headers, and browser CRUD and
+recommendation results.
+
+Sprint 6 also verifies the production bundle and automatic route code
+splitting. `pnpm build:manifest` emits a source-to-chunk manifest for release
+inspection, while `pnpm release:check` runs the complete local quality gate.
+The shadcn package is classified as a development dependency because its
+Tailwind stylesheet is consumed only while building CSS.
 
 ## Known API limitations
 
@@ -118,3 +158,7 @@ and PostgreSQL stack at the documented localhost origins.
 
 External search remains optional and read-only; importing a result into the
 local catalog is a future capability rather than an implicit side effect.
+
+The current result is a local release baseline. Hosting, server deployment,
+production CORS and TLS, observability, backups, and secret management remain a
+separate future delivery decision.

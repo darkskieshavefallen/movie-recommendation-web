@@ -6,6 +6,8 @@ Frontend application for Movie Recommendation API.
 
 - Node.js 24
 - pnpm 12.5.1
+- Docker Desktop or Docker Engine with Compose, only when running the full
+  local stack
 
 ## Installation
 
@@ -20,6 +22,10 @@ Create a local environment file:
 ```bash
 cp .env.example .env.local
 ```
+
+This is the complete clean-clone setup for frontend-only development. The
+committed lockfile and pinned package-manager version make dependency
+installation reproducible.
 
 ## Development
 
@@ -62,6 +68,17 @@ FastAPI. The backend CORS defaults allow the Vite origin at
 `http://localhost:5173`. Verify the backend at http://127.0.0.1:8000/health and
 then open the frontend at http://localhost:5173.
 
+## Environment
+
+| Variable | Required | Default | Purpose |
+| --- | --- | --- | --- |
+| `VITE_API_BASE_URL` | No | `http://127.0.0.1:8000` | Browser-visible FastAPI origin used by the generated API client |
+
+Vite reads `.env.local` when the development server or build starts. Restart
+Vite after changing the value. The frontend has no database or provider
+credentials; PostgreSQL and TMDB configuration belongs only in the backend
+repository.
+
 ## Application structure
 
 The frontend uses feature-based layers:
@@ -87,6 +104,9 @@ the committed OpenAPI snapshot described below.
 
 TanStack Router generates the type-safe route tree from files in `src/routes`.
 The generated `src/routeTree.gen.ts` file is committed but must not be edited manually.
+The Vite router plugin enables automatic route code splitting, so page
+components load as independent production chunks while the application shell
+and shared runtime remain in the entry chunk.
 
 | URL | Screen |
 | --- | --- |
@@ -262,7 +282,64 @@ browser environment:
 The real-provider step is a manual smoke check only. CI and automated tests stay
 deterministic and credential-free.
 
+The latest real FastAPI/PostgreSQL compatibility run, including exact
+repository revisions and disposable-data results, is recorded in
+[`docs/REAL_BACKEND_SMOKE.md`](docs/REAL_BACKEND_SMOKE.md).
+
+## Accessibility and responsive baseline
+
+The Sprint 6 accessibility baseline covers the catalog, create form, movie
+details and recommendations, external search, and destructive confirmation:
+
+- navigation identifies the current page and moves focus to updated main
+  content after client-side route changes;
+- the skip link, forms, cards, recommendations, and delete dialog support
+  keyboard-only operation, including dialog focus restoration on `Escape`;
+- heading order and long movie content remain valid without forcing horizontal
+  scrolling;
+- skeletons, view transitions, dialogs, toasts, and loading indicators respect
+  `prefers-reduced-motion`;
+- axe-core checks the key rendered routes through the real router, query client,
+  and MSW HTTP boundary.
+
+Color contrast is verified separately because jsdom has no layout or canvas
+color engine. The semantic light and dark text pairs meet WCAG AA, including
+muted, primary, and destructive text.
+
+### Manual responsive smoke
+
+With the local stack running, check `/movies`, `/movies/new`, `/movies/1`,
+`/movies/1/edit`, and `/external-search?query=Alien` at 320, 768, and 1440 CSS
+pixels:
+
+1. Confirm the page has no horizontal scrollbar or clipped controls.
+2. Tab from the skip link through the header and primary action.
+3. Follow a client-side link and confirm focus moves to the new main content.
+4. Open the delete dialog with the keyboard, cycle within it, press `Escape`,
+   and confirm focus returns to **Delete**.
+5. Enable reduced motion and confirm loading indicators and overlays no longer
+   animate.
+6. Repeat the contrast and focus-ring check in light and dark themes.
+
 ## Checks
+
+### Scripts
+
+| Command | Purpose |
+| --- | --- |
+| `pnpm dev` | Start the Vite development server |
+| `pnpm check` | Check the OpenAPI snapshot, formatting, lint rules, and imports |
+| `pnpm check:fix` | Apply safe Biome formatting and lint fixes |
+| `pnpm typecheck` | Run the TypeScript project build without emitting application files |
+| `pnpm test` | Run all Vitest unit and component tests once |
+| `pnpm test:e2e` | Run deterministic Chromium Playwright tests |
+| `pnpm test:e2e:ui` | Open Playwright UI mode for local test authoring |
+| `pnpm build` | Typecheck and create the production bundle |
+| `pnpm build:manifest` | Build and emit `dist/.vite/manifest.json` for chunk inspection |
+| `pnpm preview` | Serve the production bundle locally |
+| `pnpm openapi:check` | Fail when generated API types differ from the committed snapshot |
+| `pnpm openapi:generate` | Regenerate TypeScript types from the OpenAPI snapshot |
+| `pnpm release:check` | Run the complete local quality gate used for a release candidate |
 
 Run formatting, linting, and import organization checks:
 
@@ -288,11 +365,53 @@ Run unit tests once:
 pnpm test
 ```
 
+Install the Playwright Chromium binary once on a development machine:
+
+```bash
+pnpm exec playwright install chromium
+```
+
+Run the deterministic browser E2E suite:
+
+```bash
+pnpm test:e2e
+```
+
+Open Playwright UI mode while authoring a browser scenario:
+
+```bash
+pnpm test:e2e:ui
+```
+
+Playwright starts its own Vite server at `http://127.0.0.1:4173`. Browser API
+requests are intercepted by the per-test in-memory API fixture, so E2E tests do
+not require FastAPI, PostgreSQL, TMDB, or credentials. Every test receives fresh
+movie state and may run independently or in parallel.
+
+The suite covers mobile catalog pagination, create/edit/delete, movie details
+and recommendation navigation, external search, and the disabled-provider
+state through visible user behavior and web-first assertions.
+
+Screenshots and videos are retained only for failed tests. CI retries once and
+records a trace for that retry; the HTML report and failure artifacts are
+uploaded for seven days when the browser job fails.
+
 Create a production build:
 
 ```bash
 pnpm build
 ```
+
+Inspect route chunks and their source mapping when preparing a release:
+
+```bash
+pnpm build:manifest
+```
+
+The Sprint 6 baseline emits independent chunks for the catalog, create, edit,
+details, and external-search screens. Its largest JavaScript entry is about
+326 kB (105 kB gzip), and the largest lazy/shared form chunk is about 123 kB
+(38 kB gzip); Vite reports no oversized chunk warning.
 
 Preview the production build:
 
@@ -305,7 +424,41 @@ Open http://localhost:4173 in the browser.
 ## Continuous integration
 
 GitHub Actions runs the frozen pnpm install, formatting/linting and OpenAPI
-drift check, TypeScript typecheck, unit tests, and production build for every
-pull request and every push to `main`. CI uses Node.js from `.nvmrc` (Node 24)
-and caches the pnpm package store using `pnpm-lock.yaml`; it does not cache
-`node_modules`, environment files, or secrets.
+drift check, TypeScript typecheck, unit tests, production build, and mandatory
+Chromium E2E test for every pull request and every push to `main`. CI uses
+Node.js from `.nvmrc` (Node 24) and caches the pnpm package store using
+`pnpm-lock.yaml`; it does not cache `node_modules`, environment files, or
+secrets.
+
+## Release baseline and roadmap
+
+Sprint 6 is a local, documented frontend baseline rather than a hosted
+deployment. Before accepting its pull request, run the complete gate from a
+clean clone:
+
+```bash
+corepack enable
+pnpm install --frozen-lockfile
+pnpm exec playwright install chromium
+pnpm release:check
+```
+
+Create the release tag only after the sprint pull request is reviewed, accepted,
+and merged into `main`. Tagging an unmerged feature-branch commit would not
+represent the accepted baseline.
+
+Known product and delivery limitations:
+
+- the API has no authentication, authorization, or multi-user isolation;
+- catalog pagination has no total count and the UI cannot show a final page
+  number;
+- local movies have no poster/image fields;
+- external search is read-only and cannot import a result;
+- recommendations are deterministic backend rules, not ML personalization;
+- frontend hosting, backend deployment, production CORS, TLS, observability,
+  backups, and secret management are intentionally not implemented.
+
+Next roadmap decisions are production topology and hosting, deployment-time API
+configuration, monitoring/error reporting, and only then any new product work
+such as authentication or external-result import. Server deployment remains a
+separate future project and is not implied by this local release.

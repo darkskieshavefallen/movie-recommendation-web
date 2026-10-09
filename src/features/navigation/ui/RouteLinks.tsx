@@ -15,6 +15,7 @@ export function RouteLinks() {
             search={{ offset: 0, limit: 20 }}
             className={linkClassName}
             activeProps={{
+              'aria-current': 'page',
               className: cn(linkClassName, 'bg-muted text-foreground'),
             }}
           >
@@ -26,6 +27,7 @@ export function RouteLinks() {
             to="/movies/new"
             className={linkClassName}
             activeProps={{
+              'aria-current': 'page',
               className: cn(linkClassName, 'bg-muted text-foreground'),
             }}
           >
@@ -39,6 +41,7 @@ export function RouteLinks() {
             search={{}}
             className={linkClassName}
             activeProps={{
+              'aria-current': 'page',
               className: cn(linkClassName, 'bg-muted text-foreground'),
             }}
           >

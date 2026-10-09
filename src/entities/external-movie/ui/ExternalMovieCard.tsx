@@ -25,9 +25,9 @@ export function ExternalMovieCard({ movie }: ExternalMovieCardProps) {
             External catalog
           </p>
           <CardTitle>
-            <h2 id={titleId} className="break-words">
+            <h3 id={titleId} className="break-words">
               {movie.title}
-            </h2>
+            </h3>
           </CardTitle>
           <CardDescription className="flex items-center gap-1.5">
             <CalendarDaysIcon className="size-4" aria-hidden="true" />
