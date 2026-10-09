@@ -140,6 +140,12 @@ The completed ANT-66 compatibility run is recorded in
 fresh migration and seed evidence, real CORS headers, and browser CRUD and
 recommendation results.
 
+Sprint 6 also verifies the production bundle and automatic route code
+splitting. `pnpm build:manifest` emits a source-to-chunk manifest for release
+inspection, while `pnpm release:check` runs the complete local quality gate.
+The shadcn package is classified as a development dependency because its
+Tailwind stylesheet is consumed only while building CSS.
+
 ## Known API limitations
 
 - `GET /movies/` exposes `offset` and `limit` but no total count.
@@ -152,3 +158,7 @@ recommendation results.
 
 External search remains optional and read-only; importing a result into the
 local catalog is a future capability rather than an implicit side effect.
+
+The current result is a local release baseline. Hosting, server deployment,
+production CORS and TLS, observability, backups, and secret management remain a
+separate future delivery decision.
