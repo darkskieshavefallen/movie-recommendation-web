@@ -1,8 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
+import { DEFAULT_RECOMMENDATIONS_LIMIT } from '@/entities/movie/model/recommendations'
 import { apiClient } from '@/shared/api/client'
 import { queryKeys } from '@/shared/api/queryKeys'
-
-export const DEFAULT_RECOMMENDATIONS_LIMIT = 5
 
 type MovieRecommendationsQueryParams = {
   limit?: number
