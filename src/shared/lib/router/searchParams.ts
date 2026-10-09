@@ -10,7 +10,8 @@ export type ExternalSearch = {
 const DEFAULT_OFFSET = 0
 const DEFAULT_LIMIT = 20
 const MAX_LIMIT = 100
-const MAX_QUERY_LENGTH = 200
+export const MIN_EXTERNAL_SEARCH_QUERY_LENGTH = 1
+export const MAX_EXTERNAL_SEARCH_QUERY_LENGTH = 200
 
 function readInteger(value: unknown, fallback: number) {
   if (
@@ -46,5 +47,8 @@ export function parseExternalSearch(
 
   const query = search.query.trim()
 
-  return query.length > 0 && query.length <= MAX_QUERY_LENGTH ? { query } : {}
+  return query.length >= MIN_EXTERNAL_SEARCH_QUERY_LENGTH &&
+    query.length <= MAX_EXTERNAL_SEARCH_QUERY_LENGTH
+    ? { query }
+    : {}
 }

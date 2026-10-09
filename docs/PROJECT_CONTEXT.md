@@ -14,7 +14,7 @@ response DTOs by hand.
 
 ## Current implementation
 
-Web Sprints 1–4 provide:
+Web Sprints 1–5 provide:
 
 - application shell, responsive design tokens, dark mode, and typed routes;
 - shared OpenAPI client, TanStack Query cache, safe API error mapping, and MSW
@@ -30,7 +30,13 @@ Web Sprints 1–4 provide:
 - direct and cyclic recommendation navigation without retaining the previous
   source response;
 - recommendation loading, successful empty, safe error, retry, responsive, and
-  reduced-motion states.
+  reduced-motion states;
+- URL-backed, submit-only external movie search through the FastAPI boundary;
+- provider-independent external result cards that cannot mutate the local
+  catalog;
+- explicit empty, disabled, authentication, rate-limit, timeout, unavailable,
+  and safe fallback states with user-controlled retry;
+- persistent TMDB attribution and a clear read-only, not-saved notice.
 
 Layering follows `app/routes/pages -> features -> entities -> shared`. Server
 state belongs to TanStack Query, route state belongs to TanStack Router, and
@@ -72,6 +78,21 @@ The recommendation suite additionally covers:
 - direct route refresh and cyclic source navigation;
 - cache invalidation after catalog mutations.
 
+The external-search suite additionally covers:
+
+- submitted URL state, direct refresh, and back/forward restoration;
+- successful results, missing optional fields, long content, and empty results;
+- disabled `503`, rate-limited `429`, timeout `504`, authentication, unavailable,
+  and unexpected provider failures;
+- manual retry after transient failure and suppression of raw response details;
+- the TMDB credit and the external-results-not-saved boundary.
+
+All provider scenarios in the automated suite are intercepted by MSW at the
+FastAPI route. Tests and CI never call TMDB or load a real credential. A single
+bounded real-provider query is reserved for the local manual smoke documented
+in `README.md`, with the credential stored only in the backend's ignored
+environment file.
+
 Before completing a sprint, run:
 
 ```bash
@@ -95,5 +116,5 @@ and PostgreSQL stack at the documented localhost origins.
 - Concurrent edits have no version token; the UI can explain a `409` if the
   backend reports one, but cannot merge competing edits.
 
-The next planned milestone extends external search without changing these CRUD
-or recommendation ownership boundaries.
+External search remains optional and read-only; importing a result into the
+local catalog is a future capability rather than an implicit side effect.

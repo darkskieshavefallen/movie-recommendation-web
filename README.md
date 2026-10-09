@@ -224,6 +224,44 @@ origins:
 7. Create or edit a matching movie and confirm an already-open recommendation
    view refreshes instead of retaining its cached empty result.
 
+## External movie search
+
+The completed fifth web sprint adds an optional, read-only external catalog:
+
+- `/external-search?query=...` keeps only submitted, normalized searches in the
+  URL, so refresh and browser history reproduce the same result;
+- provider responses are rendered through an application-owned movie shape and
+  never added to the local PostgreSQL catalog;
+- empty, disabled, authentication, rate-limit, timeout, unavailable, and
+  unexpected-response states provide safe guidance without exposing raw
+  provider payloads;
+- transient failures retry only when the user asks;
+- the page displays the required TMDB attribution, approved logo, and API terms
+  link in every search state.
+
+Component tests use MSW at the FastAPI HTTP boundary. They never call TMDB or
+require provider credentials.
+
+### Manual local external-search smoke
+
+Start the frontend and backend at the documented localhost origins. Keep TMDB
+disabled first and do not place a provider token in the frontend repository or
+browser environment:
+
+1. Open `/external-search`, submit **Alien**, and confirm the disabled-catalog
+   state leaves the local catalog link available.
+2. Confirm the TMDB credit, logo, API terms link, and read-only notice remain
+   visible.
+3. In the backend repository only, set `TMDB_ENABLED=true` and
+   `TMDB_READ_ACCESS_TOKEN` in its ignored `.env`, then restart the API.
+4. Submit one bounded **Alien** search and confirm normalized result cards load.
+5. Open the local catalog and confirm no external result was saved.
+6. Remove the token from captured terminal output, screenshots, issue comments,
+   and logs; never publish the raw provider response.
+
+The real-provider step is a manual smoke check only. CI and automated tests stay
+deterministic and credential-free.
+
 ## Checks
 
 Run formatting, linting, and import organization checks:
