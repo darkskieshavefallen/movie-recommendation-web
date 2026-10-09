@@ -102,6 +102,13 @@ Contrast remains a real-browser/manual check because jsdom does not provide the
 layout and canvas color engine axe needs for that rule. Both theme palettes use
 WCAG AA text pairs for foreground, muted, primary, and destructive content.
 
+Playwright provides the browser-level E2E harness for Sprint 6. It starts an
+isolated Vite server, runs required Chromium tests, and intercepts the complete
+frontend API boundary with fresh in-memory state per test. Tests use accessible
+role and label locators, run independently, and never require the real backend,
+database, provider, or secrets. On failure, CI retains screenshots, video,
+trace, error context, and the HTML report for diagnosis.
+
 All provider scenarios in the automated suite are intercepted by MSW at the
 FastAPI route. Tests and CI never call TMDB or load a real credential. A single
 bounded real-provider query is reserved for the local manual smoke documented
@@ -116,6 +123,7 @@ pnpm check
 pnpm typecheck
 pnpm test
 pnpm build
+pnpm test:e2e
 ```
 
 The manual smoke checklist lives in `README.md` and must use the real FastAPI

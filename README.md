@@ -323,6 +323,33 @@ Run unit tests once:
 pnpm test
 ```
 
+Install the Playwright Chromium binary once on a development machine:
+
+```bash
+pnpm exec playwright install chromium
+```
+
+Run the deterministic browser E2E suite:
+
+```bash
+pnpm test:e2e
+```
+
+Open Playwright UI mode while authoring a browser scenario:
+
+```bash
+pnpm test:e2e:ui
+```
+
+Playwright starts its own Vite server at `http://127.0.0.1:4173`. Browser API
+requests are intercepted by the per-test in-memory API fixture, so E2E tests do
+not require FastAPI, PostgreSQL, TMDB, or credentials. Every test receives fresh
+movie state and may run independently or in parallel.
+
+Screenshots and videos are retained only for failed tests. CI retries once and
+records a trace for that retry; the HTML report and failure artifacts are
+uploaded for seven days when the browser job fails.
+
 Create a production build:
 
 ```bash
@@ -340,7 +367,8 @@ Open http://localhost:4173 in the browser.
 ## Continuous integration
 
 GitHub Actions runs the frozen pnpm install, formatting/linting and OpenAPI
-drift check, TypeScript typecheck, unit tests, and production build for every
-pull request and every push to `main`. CI uses Node.js from `.nvmrc` (Node 24)
-and caches the pnpm package store using `pnpm-lock.yaml`; it does not cache
-`node_modules`, environment files, or secrets.
+drift check, TypeScript typecheck, unit tests, production build, and mandatory
+Chromium E2E test for every pull request and every push to `main`. CI uses
+Node.js from `.nvmrc` (Node 24) and caches the pnpm package store using
+`pnpm-lock.yaml`; it does not cache `node_modules`, environment files, or
+secrets.

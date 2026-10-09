@@ -15,6 +15,8 @@
     "openapi:check": "openapi-typescript openapi/movie-recommendation-api.json --output src/shared/api/generated/schema.d.ts --alphabetize --check",
     "openapi:generate": "openapi-typescript openapi/movie-recommendation-api.json --output src/shared/api/generated/schema.d.ts --alphabetize",
     "test": "vitest run",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "typecheck": "tsc -b --pretty false",
     "preview": "vite preview"
   },
@@ -38,6 +40,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.0",
+    "@playwright/test": "^1.64.0",
     "@tailwindcss/vite": "4.3.3",
     "@tanstack/router-plugin": "^1.168.40",
     "@testing-library/jest-dom": "^7.0.1",
