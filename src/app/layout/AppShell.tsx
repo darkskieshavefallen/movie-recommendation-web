@@ -1,10 +1,25 @@
-import { Link, Outlet } from '@tanstack/react-router'
+import { Link, Outlet, useLocation } from '@tanstack/react-router'
 import { ClapperboardIcon } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { type ReactNode, useEffect, useRef } from 'react'
 import { RouteLinks } from '@/features/navigation/ui/RouteLinks'
 import { ThemeToggle } from '@/features/theme/ui/ThemeToggle'
 
 export function AppShell({ children }: { children?: ReactNode }) {
+  const locationHref = useLocation({ select: (location) => location.href })
+  const previousLocationHref = useRef(locationHref)
+
+  useEffect(() => {
+    if (previousLocationHref.current === locationHref) {
+      return
+    }
+
+    previousLocationHref.current = locationHref
+    document.querySelector<HTMLElement>('#main-content')?.focus({
+      preventScroll: true,
+    })
+    window.scrollTo({ top: 0 })
+  }, [locationHref])
+
   return (
     <div className="min-h-svh bg-background text-foreground">
       <a
@@ -32,7 +47,8 @@ export function AppShell({ children }: { children?: ReactNode }) {
       </header>
       <main
         id="main-content"
-        className="mx-auto w-full max-w-6xl px-page py-section"
+        tabIndex={-1}
+        className="mx-auto w-full max-w-6xl px-page py-section focus-visible:outline-3 focus-visible:outline-offset-[-3px] focus-visible:outline-ring"
       >
         {children ?? <Outlet />}
       </main>

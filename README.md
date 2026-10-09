@@ -262,6 +262,41 @@ browser environment:
 The real-provider step is a manual smoke check only. CI and automated tests stay
 deterministic and credential-free.
 
+## Accessibility and responsive baseline
+
+The Sprint 6 accessibility baseline covers the catalog, create form, movie
+details and recommendations, external search, and destructive confirmation:
+
+- navigation identifies the current page and moves focus to updated main
+  content after client-side route changes;
+- the skip link, forms, cards, recommendations, and delete dialog support
+  keyboard-only operation, including dialog focus restoration on `Escape`;
+- heading order and long movie content remain valid without forcing horizontal
+  scrolling;
+- skeletons, view transitions, dialogs, toasts, and loading indicators respect
+  `prefers-reduced-motion`;
+- axe-core checks the key rendered routes through the real router, query client,
+  and MSW HTTP boundary.
+
+Color contrast is verified separately because jsdom has no layout or canvas
+color engine. The semantic light and dark text pairs meet WCAG AA, including
+muted, primary, and destructive text.
+
+### Manual responsive smoke
+
+With the local stack running, check `/movies`, `/movies/new`, `/movies/1`,
+`/movies/1/edit`, and `/external-search?query=Alien` at 320, 768, and 1440 CSS
+pixels:
+
+1. Confirm the page has no horizontal scrollbar or clipped controls.
+2. Tab from the skip link through the header and primary action.
+3. Follow a client-side link and confirm focus moves to the new main content.
+4. Open the delete dialog with the keyboard, cycle within it, press `Escape`,
+   and confirm focus returns to **Delete**.
+5. Enable reduced motion and confirm loading indicators and overlays no longer
+   animate.
+6. Repeat the contrast and focus-ring check in light and dark themes.
+
 ## Checks
 
 Run formatting, linting, and import organization checks:

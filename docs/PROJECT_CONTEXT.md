@@ -87,6 +87,21 @@ The external-search suite additionally covers:
 - manual retry after transient failure and suppression of raw response details;
 - the TMDB credit and the external-results-not-saved boundary.
 
+The Sprint 6 accessibility baseline additionally covers:
+
+- automated axe-core audits of the catalog, create form, movie details and
+  recommendations, and external search routes;
+- keyboard route navigation with focus moved to updated main content;
+- delete-dialog focus containment and restoration after `Escape`;
+- current-page navigation semantics, ordered headings, long-content wrapping,
+  and reduced-motion behavior for overlays and notifications;
+- browser layout checks at 320, 768, and 1440 CSS pixels with no horizontal
+  overflow on the key routes.
+
+Contrast remains a real-browser/manual check because jsdom does not provide the
+layout and canvas color engine axe needs for that rule. Both theme palettes use
+WCAG AA text pairs for foreground, muted, primary, and destructive content.
+
 All provider scenarios in the automated suite are intercepted by MSW at the
 FastAPI route. Tests and CI never call TMDB or load a real credential. A single
 bounded real-provider query is reserved for the local manual smoke documented

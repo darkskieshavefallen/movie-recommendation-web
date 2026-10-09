@@ -34,6 +34,25 @@ describe('DeleteMovieDialog', () => {
     expect(requestCount).toBe(0)
   })
 
+  it('traps keyboard focus and restores it after Escape', async () => {
+    const { user } = await renderRoute('/movies/1')
+    const trigger = await screen.findByRole('button', { name: 'Delete' })
+
+    trigger.focus()
+    await user.keyboard('{Enter}')
+
+    const dialog = screen.getByRole('dialog', { name: 'Delete Alien?' })
+    expect(dialog).toBeVisible()
+    await waitFor(() => {
+      expect(dialog.contains(document.activeElement)).toBe(true)
+    })
+
+    await user.keyboard('{Escape}')
+
+    expect(dialog).not.toBeInTheDocument()
+    expect(trigger).toHaveFocus()
+  })
+
   it('removes a deleted movie from cache and the catalog UI', async () => {
     let movies = [...movieFixtures]
 

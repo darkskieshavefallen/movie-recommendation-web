@@ -108,7 +108,7 @@ export function MovieDetailsPage({
           </p>
           <h1
             id="movie-title"
-            className="max-w-3xl font-heading text-3xl font-semibold tracking-tight sm:text-4xl"
+            className="max-w-3xl break-words font-heading text-3xl font-semibold tracking-tight sm:text-4xl"
           >
             {movie.title}
           </h1>
@@ -136,7 +136,7 @@ export function MovieDetailsPage({
           </CardTitle>
         </CardHeader>
         <CardContent className="grid gap-6">
-          <p className="whitespace-pre-line text-base leading-7 text-muted-foreground">
+          <p className="break-words whitespace-pre-line text-base leading-7 text-muted-foreground">
             {movie.description?.trim() || 'No description is available.'}
           </p>
           <div className="grid gap-2">
