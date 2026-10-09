@@ -1,10 +1,12 @@
 import type { ReactNode } from 'react'
 import { useExternalMovieSearchQuery } from '@/entities/external-movie/api/useExternalMovieSearchQuery'
+import { toExternalSearchErrorViewModel } from '@/entities/external-movie/model/errors'
 import { ExternalMovieCard } from '@/entities/external-movie/ui/ExternalMovieCard'
 import { ExternalSearchForm } from '@/features/external-search/ui/ExternalSearchForm'
 import type { ExternalSearch } from '@/shared/lib/router/searchParams'
 import { PlaceholderPage } from '@/shared/ui/PlaceholderPage'
 import { ExternalSearchEmptyState } from './ui/ExternalSearchEmptyState'
+import { ExternalSearchErrorState } from './ui/ExternalSearchErrorState'
 import { ExternalSearchSkeleton } from './ui/ExternalSearchSkeleton'
 
 type ExternalSearchPageProps = ExternalSearch & {
@@ -28,18 +30,11 @@ export function ExternalSearchPage({
     searchContent = <ExternalSearchSkeleton />
   } else if (searchQuery.isError) {
     searchContent = (
-      <section
-        className="rounded-xl border border-destructive/30 bg-card p-6"
-        role="alert"
-      >
-        <h2 className="font-heading text-xl font-semibold">
-          External search unavailable
-        </h2>
-        <p className="mt-2 text-muted-foreground">
-          The external catalog could not complete this search. Your local
-          collection is unaffected.
-        </p>
-      </section>
+      <ExternalSearchErrorState
+        error={toExternalSearchErrorViewModel(searchQuery.error)}
+        isRetrying={searchQuery.isFetching}
+        onRetry={() => void searchQuery.refetch()}
+      />
     )
   } else if (searchQuery.data.results.length === 0) {
     searchContent = <ExternalSearchEmptyState query={query} />

@@ -6,6 +6,7 @@ export function useExternalMovieSearchQuery(query: string | null) {
   return useQuery({
     queryKey: queryKeys.externalSearch.results(query ?? ''),
     enabled: query !== null,
+    retry: false,
     queryFn: async ({ signal }) => {
       if (query === null) {
         throw new Error('A confirmed external search query is required.')
