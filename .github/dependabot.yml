@@ -8,6 +8,10 @@ updates:
       time: "08:00"
       timezone: Asia/Yerevan
     open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-major
     groups:
       safe-updates:
         update-types:
@@ -22,6 +26,10 @@ updates:
       time: "08:00"
       timezone: Asia/Yerevan
     open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-major
     groups:
       safe-updates:
         update-types:
