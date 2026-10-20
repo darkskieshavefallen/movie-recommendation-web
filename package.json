@@ -1,7 +1,12 @@
 {
   "name": "movie-recommendation-web",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.1",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/darkskieshavefallen/movie-recommendation-web.git"
+  },
   "type": "module",
   "packageManager": "pnpm@12.5.1",
   "engines": {

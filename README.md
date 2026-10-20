@@ -2,6 +2,9 @@
 
 Frontend application for Movie Recommendation API.
 
+[![CI](https://github.com/darkskieshavefallen/movie-recommendation-web/actions/workflows/ci.yml/badge.svg)](https://github.com/darkskieshavefallen/movie-recommendation-web/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 ## Requirements
 
 - Node.js 24
@@ -462,3 +465,13 @@ Next roadmap decisions are production topology and hosting, deployment-time API
 configuration, monitoring/error reporting, and only then any new product work
 such as authentication or external-result import. Server deployment remains a
 separate future project and is not implied by this local release.
+
+## Contributing and project tracking
+
+This repository uses Linear as its only task tracker; GitHub Issues are not
+used. See [CONTRIBUTING.md](CONTRIBUTING.md) for the development workflow and
+[SECURITY.md](SECURITY.md) for confidential vulnerability reporting.
+
+## License
+
+Released under the [MIT License](LICENSE).
